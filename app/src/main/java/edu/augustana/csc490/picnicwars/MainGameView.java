@@ -37,10 +37,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private int[][] activeAnts;
     private int[][] antRelease;
-    //private int[]  toggleYMovement;
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
-    private int yToggle = 0;
 
     private Paint myPaint;
     private Paint backgroundPaint;
@@ -94,19 +92,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         toggleY = randInt(0,1);
         }
     }
-
-
-    /*
-    public void drawAnts(Canvas canvas, double interval){
-        int i = 0;
-        for (int[] ints: antRelease = new int[NUM_ANTS_EASY][2]) {
-         //   if (antRelease[i][0] == 0) {
-                canvas.drawCircle(activeAnts[i][0], activeAnts[i][1], 20, myPaint);
-         //   }
-            i++;
-        }
-    }
-    */
 
     // called when the size changes (and first time, when view is created)
     @Override
