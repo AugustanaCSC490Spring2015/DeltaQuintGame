@@ -3,10 +3,15 @@
 package edu.augustana.csc490.picnicwars;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -24,21 +29,22 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Activity mainActivity; // keep a reference to the main Activity
 
     private boolean isGameOver = true;
+    private boolean dialogIsDisplayed = false;
+    // private boolean allAntsDead = false;
 
-    private int x;
-    private int y;
     private int screenWidth;
     private int screenHeight;
 
-    private double XANTSPEED = 100;
-    private double YANTSPEED = 25;
-    private int NUM_ANTS_EASY = 3;
+    private double X_ANT_SPEED_EASY = 100;
+    private double Y_ANT_SPEED_EASY = 25;
+    private int NUM_ANTS_EASY = 5;
     private double TIME_EASY = 20;
 
     private int[][] activeAnts;
     private int[][] antRelease;
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
+    private int successfulAnts;//ants that get to the basket
 
     private Paint myPaint;
     private Paint backgroundPaint;
@@ -62,13 +68,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     public void populateAnts() {
         int i = 0;
         antRelease = new int[NUM_ANTS_EASY][2];
-        //toggleYMovement = new int[NUM_ANTS_EASY];
+
         for (int[] ints : activeAnts = new int[NUM_ANTS_EASY][2]) {
             activeAnts[i][0]=(int) (screenWidth * .01);
             activeAnts[i][1]= randInt((int) (screenHeight*.3),(int) (screenHeight*.7));
             antRelease[i][0] = randInt(3, (int) (TIME_EASY  - 10));
             antRelease[i][1] = -1;
-            //toggleYMovement[i]=randInt(1,2);
             i++;
         }
         antRelease[0][0] = 1;
@@ -81,16 +86,39 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 antRelease[i][1] = 0;
             }
             if (antRelease[i][1] == 0) {
-                activeAnts[i][0] += interval * XANTSPEED;
+                activeAnts[i][0] += interval * X_ANT_SPEED_EASY;
                 if ((toggleY == 1) && (activeAnts[i][1] < (screenHeight * .8))) {
-                    activeAnts[i][1] += interval * YANTSPEED;
+                    activeAnts[i][1] += interval * Y_ANT_SPEED_EASY;
                 } else if ((toggleY != 1) && (activeAnts[i][1] > (screenHeight * .2))) {
-                    activeAnts[i][1] += -1* interval * YANTSPEED;
+                    activeAnts[i][1] += -1* interval * Y_ANT_SPEED_EASY;
                 }
                 canvas.drawCircle(activeAnts[i][0], activeAnts[i][1], 20, myPaint);
             }
-        toggleY = randInt(0,1);
+            toggleY = randInt(0,1);
         }
+    }
+
+    //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
+    private void checkTouch(int x, int y){
+        for (int i=0;i<NUM_ANTS_EASY;i++) {
+            if ((Math.abs(activeAnts[i][0] - x) < 40) && (Math.abs(activeAnts[i][1] - y) < 40)) {
+                antRelease[i][1] = 1;
+            }
+        }
+    }
+
+    private boolean checkAntStatus() {
+        int countDead =0;
+        for (int i=0;i<NUM_ANTS_EASY;i++) {
+            countDead += antRelease[i][1];
+            if (activeAnts[i][0] > (screenWidth * .95)) {
+                successfulAnts++;
+                antRelease[i][1]=-1;
+                antRelease[i][0]= (int) TIME_EASY;
+            }
+        }
+        if (countDead == NUM_ANTS_EASY) return true;
+        else return false;
     }
 
     // called when the size changes (and first time, when view is created)
@@ -105,20 +133,19 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         startNewGame();
 
         textPaint.setTextSize(w / 20); // text size 1/20 of screen width
-       // textPaint.setAntiAlias(true); // smoothes the text
+        // textPaint.setAntiAlias(true); // smoothes the text
     }
 
     public void startNewGame()
     {
-        this.x = 25;
-        this.y = 25;
 
         timeLeft = TIME_EASY; // start the countdown at 10 seconds
+        totalElapsedTime=0;
+        successfulAnts = 0;
 
         populateAnts();
 
-        if (isGameOver)
-        {
+        if (isGameOver)  {
             isGameOver = false;
             gameThread = new GameThread(getHolder());
             gameThread.start(); // start the main game loop going
@@ -127,8 +154,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void updateView(Canvas canvas, double elapsedTimeMS) {
         double interval = elapsedTimeMS / 1000.0; // convert to seconds
-
-        //updateAnts(interval, canvas);
 
         if (canvas != null) {
             canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
@@ -143,9 +168,56 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             timeLeft = 0.0;
             isGameOver = true; // the game is over
             gameThread.setRunning(false); // terminate thread
-            //showGameOverDialog(R.string.lose); // show the losing dialog
+            showGameOverDialog(R.string.lose); // show the losing dialog
+        } else if (checkAntStatus()){
+            isGameOver = true;
+            gameThread.setRunning(false);
+            showGameOverDialog(R.string.win); //show winning dialog
         }
     }
+
+    // display an AlertDialog when the game ends
+    private void showGameOverDialog(final int messageId) {
+
+        final DialogFragment gameResult =
+                new DialogFragment() {
+                    // create an AlertDialog and return it
+                    @Override
+                    public Dialog onCreateDialog(Bundle bundle) {
+                        // create dialog displaying String resource for messageId
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle(getResources().getString(messageId));
+
+                        // display number of shots fired and total time elapsed
+                        builder.setMessage(getResources().getString(R.string.results, successfulAnts, totalElapsedTime));
+                        builder.setPositiveButton(R.string.reset_button_string,
+                                new DialogInterface.OnClickListener() {
+                                    // called when "Reset Game" Button is pressed
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialogIsDisplayed = false;
+                                        startNewGame(); // set up and start a new game
+                                    }
+                                } // end anonymous inner class
+                        ); // end call to setPositiveButton
+
+                        return builder.create(); // return the AlertDialog
+                    } // end method onCreateDialog
+                }; // end DialogFragment anonymous inner class
+                // in GUI thread, use FragmentManager to display the DialogFragment
+                mainActivity.runOnUiThread(
+                new Runnable() {
+                    public void run()
+                    {
+                        dialogIsDisplayed = true;
+                        gameResult.setCancelable(false); // modal dialog
+                        gameResult.show(mainActivity.getFragmentManager(), "results");
+                    }
+                } // end Runnable
+        ); // end call to runOnUiThread
+    } // end method showGameOverDialog
+
+
 
     public void insertTime(Canvas canvas) {
         canvas.drawText(getResources().getString(
@@ -211,14 +283,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-        @Override
-    public boolean onTouchEvent(MotionEvent e)
-    {
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        int xTouch = 0;
+        int yTouch = 0;
+
         if (e.getAction() == MotionEvent.ACTION_DOWN)
         {
-            this.x = (int) e.getX();
-            this.y = (int) e.getY();
+            xTouch = (int) e.getX();
+            yTouch = (int) e.getY();
         }
+
+        checkTouch(xTouch,yTouch);
 
         return true;
     }

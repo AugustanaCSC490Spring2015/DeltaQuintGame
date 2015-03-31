@@ -3,5 +3,9 @@
 
     <string name="app_name">Picnic Wars</string>
     <string name="time_left">Time Left: %.1f seconds </string>
+    <string name="results"> results </string>
+    <string name="reset_button_string"> Reset Game? </string>
+    <string name="win"> Win!</string>
+    <string name="lose"> You Lose! </string>
 
 </resources>
