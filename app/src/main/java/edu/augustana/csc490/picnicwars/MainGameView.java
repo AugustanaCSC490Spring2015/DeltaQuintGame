@@ -37,7 +37,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private double X_ANT_SPEED_EASY = 100;
     private double Y_ANT_SPEED_EASY = 25;
-    private int NUM_ANTS_EASY = 5;
+    private int NUM_ANTS_EASY = 10;
     private double TIME_EASY = 20;
 
     private int[][] activeAnts;
@@ -82,7 +82,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
         for (int i = 0;i<NUM_ANTS_EASY;i++) {
-            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
+           if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
             }
             if (antRelease[i][1] == 0) {
@@ -96,28 +96,46 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
             toggleY = randInt(0,1);
         }
+
     }
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
         for (int i=0;i<NUM_ANTS_EASY;i++) {
             if ((Math.abs(activeAnts[i][0] - x) < 40) && (Math.abs(activeAnts[i][1] - y) < 40)) {
-                antRelease[i][1] = 1;
+                antRelease[i][1] = -2;//ant killed, assigned -2
+                antRelease[i][0] = (int) TIME_EASY + 1;
             }
         }
     }
 
-    private boolean checkAntStatus() {
-        int countDead =0;
+    //count how many ants made it to the basket
+    private int countSuccess() {
+        successfulAnts = 0;
         for (int i=0;i<NUM_ANTS_EASY;i++) {
-            countDead += antRelease[i][1];
-            if (activeAnts[i][0] > (screenWidth * .95)) {
+            if ((antRelease[i][0] == (int) TIME_EASY +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
                 successfulAnts++;
-                antRelease[i][1]=-1;
-                antRelease[i][0]= (int) TIME_EASY;
             }
         }
-        if (countDead == NUM_ANTS_EASY) return true;
+        return successfulAnts;
+    }
+
+    //check to see if all ants are dead. Return true if all ants are dead.
+    private boolean checkAntStatus() {
+        int countDead = 0;
+        int countDoneAnts = 0;
+        for (int i=0;i<NUM_ANTS_EASY;i++) {
+            countDead += antRelease[i][1];
+            if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) TIME_EASY + 1)) {
+                countDoneAnts++;
+            }
+            if ((activeAnts[i][0] > (screenWidth * .95))&&(antRelease[i][1]==0)) { //ant made it to the picnic basket
+                antRelease[i][1]= -1; //ant returned to pre game status
+                antRelease[i][0]= (int) TIME_EASY + 1; //ant wont' be released during this game.
+            }
+        }
+        if ((countDoneAnts == NUM_ANTS_EASY) || (countDead == -2* NUM_ANTS_EASY)) return true;
+        //if (countDead == -2 * NUM_ANTS_EASY) return true;
         else return false;
     }
 
@@ -141,7 +159,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         timeLeft = TIME_EASY; // start the countdown at 10 seconds
         totalElapsedTime=0;
-        successfulAnts = 0;
 
         populateAnts();
 
@@ -172,6 +189,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         } else if (checkAntStatus()){
             isGameOver = true;
             gameThread.setRunning(false);
+            if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
             showGameOverDialog(R.string.win); //show winning dialog
         }
     }
@@ -189,7 +207,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         builder.setTitle(getResources().getString(messageId));
 
                         // display number of shots fired and total time elapsed
-                        builder.setMessage(getResources().getString(R.string.results, successfulAnts, totalElapsedTime));
+                        builder.setMessage(getResources().getString(R.string.results, countSuccess()));
                         builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
@@ -220,8 +238,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
     public void insertTime(Canvas canvas) {
-        canvas.drawText(getResources().getString(
-                R.string.time_left, timeLeft), 30, 50, textPaint);
+        canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
     }
     //copied from http://stackoverflow.com/questions/20389890/generating-a-random-number-between-1-and-10-java
     public static int randInt(int min, int max) {
