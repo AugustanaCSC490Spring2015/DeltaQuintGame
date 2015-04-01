@@ -47,8 +47,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private int NUM_ANTS_HARD = 30;
     private double TIME_HARD = 30;
 
-    private Switch difficultySwitch = (Switch) findViewById(R.id.difficultySwitch);
-    private boolean difficultyLevel = difficultySwitch.isChecked();
+    private Switch difficultySwitch;
+    private boolean difficultyLevel;
 
     private int[][] activeAnts;
     private int[][] antRelease;
@@ -210,6 +210,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void startNewGame()
     {
+
+        difficultySwitch  = (Switch) findViewById(R.id.difficultySwitch);
+        difficultyLevel = difficultySwitch.isChecked();
+
        if (difficultyLevel) {
            x_speed = X_ANT_SPEED_HARD;
            y_speed = Y_ANT_SPEED_HARD;

@@ -21,11 +21,12 @@ public final class R {
     }
     public static final class id {
         public static final int Grid_Layout=0x7f080003;
-        public static final int buttonStartGame=0x7f080004;
-        public static final int dropdownDifficulty=0x7f080005;
+        public static final int buttonStartGame=0x7f080005;
+        public static final int difficultySwitch=0x7f080006;
         public static final int gameStarterFragment=0x7f080001;
         public static final int mainGameView=0x7f080002;
         public static final int rootRL=0x7f080000;
+        public static final int textViewDifficulty=0x7f080004;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -47,8 +48,9 @@ public final class R {
         public static final int results=0x7f060006;
         public static final int return_to_main=0x7f060007;
         public static final int start_game_button=0x7f060008;
-        public static final int time_left=0x7f060009;
-        public static final int win=0x7f06000a;
+        public static final int string_difficulty=0x7f060009;
+        public static final int time_left=0x7f06000a;
+        public static final int win=0x7f06000b;
     }
     public static final class style {
         /** 
