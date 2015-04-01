@@ -95,7 +95,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
-        //drawAnt(200,200,canvas);
 
         for (int i = 0;i<NUM_ANTS_EASY;i++) {
            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
@@ -113,7 +112,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
             toggleY = randInt(0,1);
         }
-
     }
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)

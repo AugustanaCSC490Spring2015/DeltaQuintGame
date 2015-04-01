@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="5"
+    android:rowCount="6"
+    android:id="@+id/Grid_Layout"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="171dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/app_name"
+        android:id="@+id/textViewTitle"
+        android:layout_column="3"
+        android:layout_row="0" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="191dp"
+        android:layout_height="wrap_content"
+        android:text="@string/start_game_button"
+        android:id="@+id/buttonStartGame"
+        android:layout_column="4"
+        android:layout_row="5"
+        android:onClick="mainGameView"/>
+
+    <Switch
+        android:layout_width="188dp"
+        android:layout_height="wrap_content"
+        android:text="@string/difficulty_switch"
+        android:id="@+id/switchDifficulty"
+        android:layout_column="1"
+        android:layout_row="5" />
+
+</GridLayout>
