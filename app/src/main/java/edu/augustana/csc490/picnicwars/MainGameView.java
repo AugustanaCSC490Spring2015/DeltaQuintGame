@@ -8,9 +8,13 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -30,12 +34,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private boolean isGameOver = true;
     private boolean dialogIsDisplayed = false;
-    // private boolean allAntsDead = false;
 
     private int screenWidth;
     private int screenHeight;
 
-    private double X_ANT_SPEED_EASY = 100;
+    private double X_ANT_SPEED_EASY = 200;
     private double Y_ANT_SPEED_EASY = 25;
     private int NUM_ANTS_EASY = 10;
     private double TIME_EASY = 20;
@@ -49,11 +52,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Paint myPaint;
     private Paint backgroundPaint;
     private Paint textPaint;
+    private Paint antPaint;
+
+    private Bitmap drawing;
+    //private Bitmap ant;
 
     public MainGameView(Context context, AttributeSet atts)
     {
         super(context, atts);
         mainActivity = (Activity) context;
+
+        drawing= BitmapFactory.decodeResource(getResources(), R.drawable.grass);
+        //ant = BitmapFactory.decodeResources(getResources(), R.drawable.ant);
 
         getHolder().addCallback(this);
 
@@ -63,6 +73,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         backgroundPaint.setColor(Color.rgb(15, 140, 63));
         textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
+        antPaint = new Paint();
+        antPaint.setColor(Color.BLACK);
+        antPaint.setStrokeWidth(4);
+
     }
 
     public void populateAnts() {
@@ -81,6 +95,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
+        //drawAnt(200,200,canvas);
+
         for (int i = 0;i<NUM_ANTS_EASY;i++) {
            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
@@ -92,7 +108,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 } else if ((toggleY != 1) && (activeAnts[i][1] > (screenHeight * .2))) {
                     activeAnts[i][1] += -1* interval * Y_ANT_SPEED_EASY;
                 }
-                canvas.drawCircle(activeAnts[i][0], activeAnts[i][1], 20, myPaint);
+                drawAnt(activeAnts[i][0], activeAnts[i][1], canvas);
+                //canvas.drawCircle(activeAnts[i][0], activeAnts[i][1], 20, myPaint);
             }
             toggleY = randInt(0,1);
         }
@@ -107,6 +124,34 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 antRelease[i][0] = (int) TIME_EASY + 1;
             }
         }
+
+    }
+
+    private void drawAnt(float x, float y, Canvas canvas) {
+        float radiusMiddle = 4;
+        float radiusHead = 10;
+        float radiusBack = 12;
+        canvas.drawCircle(x,y,radiusMiddle,antPaint);
+        canvas.drawCircle(x + 12,y,radiusHead,antPaint);
+        canvas.drawCircle(x - 15,y,radiusBack,antPaint);
+
+        canvas.drawLine(x-20,y-20,x,y,antPaint);
+        canvas.drawLine(x-20,y-20,x-27,y-23, antPaint);
+        canvas.drawLine(x-20,y+20,x,y,antPaint);
+        canvas.drawLine(x-20,y+20,x-27,y+23, antPaint);
+
+        canvas.drawLine(x,y-15,x,y,antPaint);
+        canvas.drawLine(x-5,y-20,x,y-15, antPaint);
+        canvas.drawLine(x,y+15,x,y,antPaint);
+        canvas.drawLine(x-5,y+20,x,y+15, antPaint);
+
+        canvas.drawLine(x,y,x+9,y-20,antPaint);
+        canvas.drawLine(x,y,x + 9,y+20, antPaint);
+        canvas.drawLine(x+9,y-20,x+12,y -20,antPaint);
+        canvas.drawLine(x+9,y+20,x+12,y+20, antPaint);
+
+        canvas.drawLine(x,y,x + 30,y - 5,antPaint);
+        canvas.drawLine(x,y,x+ 30,y + 5,antPaint);
     }
 
     //count how many ants made it to the basket
@@ -129,13 +174,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) TIME_EASY + 1)) {
                 countDoneAnts++;
             }
-            if ((activeAnts[i][0] > (screenWidth * .95))&&(antRelease[i][1]==0)) { //ant made it to the picnic basket
+            if ((activeAnts[i][0] > (screenWidth * .85))&&(antRelease[i][1]==0)) { //ant made it to the picnic basket
                 antRelease[i][1]= -1; //ant returned to pre game status
                 antRelease[i][0]= (int) TIME_EASY + 1; //ant wont' be released during this game.
             }
         }
         if ((countDoneAnts == NUM_ANTS_EASY) || (countDead == -2* NUM_ANTS_EASY)) return true;
-        //if (countDead == -2 * NUM_ANTS_EASY) return true;
         else return false;
     }
 
@@ -147,6 +191,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         screenWidth = w;
         screenHeight = h;
+
+        drawing = drawing.createScaledBitmap(drawing,w,h,true);
 
         startNewGame();
 
@@ -173,7 +219,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         double interval = elapsedTimeMS / 1000.0; // convert to seconds
 
         if (canvas != null) {
-            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
+            //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
+            canvas.drawBitmap(drawing, 0, 0, null);
             updateAnts(interval, canvas);
             insertTime(canvas);
         }
@@ -239,6 +286,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void insertTime(Canvas canvas) {
         canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
+        canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
     }
     //copied from http://stackoverflow.com/questions/20389890/generating-a-random-number-between-1-and-10-java
     public static int randInt(int min, int max) {

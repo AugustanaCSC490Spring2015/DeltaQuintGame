@@ -7,7 +7,7 @@
     android:versionName="1.0" >
 <!-- comment added for testing -->
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="19"
         android:targetSdkVersion="19" />
 
     <application
