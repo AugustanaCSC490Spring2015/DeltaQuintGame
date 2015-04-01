@@ -9,5 +9,5 @@
     <string name="lose"> You Lose! </string>
     <string name="difficulty_switch"> Choose a Difficulty: </string>
     <string name="start_game_button"> New Game! </string>
-
+    <string name="return_to_main"> Return to Menu? </string>
 </resources>

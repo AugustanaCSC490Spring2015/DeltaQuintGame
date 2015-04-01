@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="edu.augustana.csc490.picnicwars.MainActivity"
+            android:name="edu.augustana.csc490.picnicwars.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
             <intent-filter>
@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SplashActivity"></activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

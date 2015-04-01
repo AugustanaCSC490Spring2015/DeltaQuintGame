@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import java.util.Random;
 
@@ -133,7 +135,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawCircle(x + 12,y,radiusHead,antPaint);
         canvas.drawCircle(x - 15,y,radiusBack,antPaint);
 
-        canvas.drawLine(x-20,y-20,x,y,antPaint);
+        canvas.drawLine(x - 20, y - 20, x, y, antPaint);
         canvas.drawLine(x-20,y-20,x-27,y-23, antPaint);
         canvas.drawLine(x-20,y+20,x,y,antPaint);
         canvas.drawLine(x-20,y+20,x-27,y+23, antPaint);
@@ -250,10 +252,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         // create dialog displaying String resource for messageId
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(getResources().getString(messageId));
-
-                        // display number of shots fired and total time elapsed
                         builder.setMessage(getResources().getString(R.string.results, countSuccess()));
-                        builder.setPositiveButton(R.string.reset_button_string,
+                       /* builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
                                     @Override
@@ -262,7 +262,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                         startNewGame(); // set up and start a new game
                                     }
                                 } // end anonymous inner class
-                        ); // end call to setPositiveButton
+                        ); // end call to setPositiveButton*/
+                       builder.setPositiveButton(R.string.return_to_main,
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialogIsDisplayed=false;
+                                        stopGame();
+                                        Intent myIntent = new Intent(getContext(), SplashActivity.class);
+                                        startActivityForResult(myIntent, 0);
+                                    }
+                                });
 
                         return builder.create(); // return the AlertDialog
                     } // end method onCreateDialog
@@ -279,8 +290,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 } // end Runnable
         ); // end call to runOnUiThread
     } // end method showGameOverDialog
-
-
 
     public void insertTime(Canvas canvas) {
         canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
