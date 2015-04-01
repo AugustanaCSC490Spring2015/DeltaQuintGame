@@ -7,16 +7,8 @@
     android:columnCount="5"
     android:rowCount="6"
     android:id="@+id/Grid_Layout"
-    tools:context=".MainActivity">
-
-    <TextView
-        android:layout_width="171dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/app_name"
-        android:id="@+id/textViewTitle"
-        android:layout_column="3"
-        android:layout_row="0" />
+    tools:context=".MainActivity"
+    android:background="@drawable/title_page">
 
     <Button
         style="?android:attr/buttonStyleSmall"

@@ -65,7 +65,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         mainActivity = (Activity) context;
 
         drawing= BitmapFactory.decodeResource(getResources(), R.drawable.grass);
-        //ant = BitmapFactory.decodeResources(getResources(), R.drawable.ant);
 
         getHolder().addCallback(this);
 
@@ -101,7 +100,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         for (int i = 0;i<NUM_ANTS_EASY;i++) {
            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
-            }
+           }
             if (antRelease[i][1] == 0) {
                 activeAnts[i][0] += interval * X_ANT_SPEED_EASY;
                 if ((toggleY == 1) && (activeAnts[i][1] < (screenHeight * .8))) {
@@ -110,7 +109,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                     activeAnts[i][1] += -1* interval * Y_ANT_SPEED_EASY;
                 }
                 drawAnt(activeAnts[i][0], activeAnts[i][1], canvas);
-                //canvas.drawCircle(activeAnts[i][0], activeAnts[i][1], 20, myPaint);
             }
             toggleY = randInt(0,1);
         }
@@ -119,7 +117,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
         for (int i=0;i<NUM_ANTS_EASY;i++) {
-            if ((Math.abs(activeAnts[i][0] - x) < 40) && (Math.abs(activeAnts[i][1] - y) < 40)) {
+            if ((Math.abs(activeAnts[i][0] - x) < 30) && (Math.abs(activeAnts[i][1] - y) < 30)) {
                 antRelease[i][1] = -2;//ant killed, assigned -2
                 antRelease[i][0] = (int) TIME_EASY + 1;
             }
@@ -219,7 +217,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         double interval = elapsedTimeMS / 1000.0; // convert to seconds
 
         if (canvas != null) {
-            //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
             canvas.drawBitmap(drawing, 0, 0, null);
             updateAnts(interval, canvas);
             insertTime(canvas);
@@ -253,7 +250,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(getResources().getString(messageId));
                         builder.setMessage(getResources().getString(R.string.results, countSuccess()));
-                       /* builder.setPositiveButton(R.string.reset_button_string,
+                        builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
                                     @Override
@@ -262,8 +259,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                         startNewGame(); // set up and start a new game
                                     }
                                 } // end anonymous inner class
-                        ); // end call to setPositiveButton*/
-                       builder.setPositiveButton(R.string.return_to_main,
+                        ); // end call to setPositiveButton
+                       builder.setNegativeButton(R.string.return_to_main,
                                 new DialogInterface.OnClickListener() {
 
                                     @Override
@@ -295,6 +292,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
         canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
     }
+
     //copied from http://stackoverflow.com/questions/20389890/generating-a-random-number-between-1-and-10-java
     public static int randInt(int min, int max) {
 
