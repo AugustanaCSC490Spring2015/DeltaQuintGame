@@ -14,15 +14,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.PaintDrawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
+import android.widget.Switch;
 
 import java.util.Random;
 
@@ -42,14 +40,25 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private double X_ANT_SPEED_EASY = 200;
     private double Y_ANT_SPEED_EASY = 25;
+    private double X_ANT_SPEED_HARD = 300;
+    private double Y_ANT_SPEED_HARD = 30;
     private int NUM_ANTS_EASY = 10;
     private double TIME_EASY = 20;
+    private int NUM_ANTS_HARD = 30;
+    private double TIME_HARD = 30;
+
+    private Switch difficultySwitch = (Switch) findViewById(R.id.difficultySwitch);
+    private boolean difficultyLevel = difficultySwitch.isChecked();
 
     private int[][] activeAnts;
     private int[][] antRelease;
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
     private int successfulAnts;//ants that get to the basket
+    private double x_speed;
+    private double y_speed;
+    private int num_ants;
+    private double time_ants;
 
     private Paint myPaint;
     private Paint backgroundPaint;
@@ -61,10 +70,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public MainGameView(Context context, AttributeSet atts)
     {
+
         super(context, atts);
         mainActivity = (Activity) context;
 
-        drawing= BitmapFactory.decodeResource(getResources(), R.drawable.grass);
+        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
 
         getHolder().addCallback(this);
 
@@ -82,12 +92,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void populateAnts() {
         int i = 0;
-        antRelease = new int[NUM_ANTS_EASY][2];
+        antRelease = new int[num_ants][2];
 
-        for (int[] ints : activeAnts = new int[NUM_ANTS_EASY][2]) {
+        for (int[] ints : activeAnts = new int[num_ants][2]) {
             activeAnts[i][0]=(int) (screenWidth * .01);
             activeAnts[i][1]= randInt((int) (screenHeight*.3),(int) (screenHeight*.7));
-            antRelease[i][0] = randInt(3, (int) (TIME_EASY  - 10));
+            antRelease[i][0] = randInt(3, (int) (time_ants  - 10));
             antRelease[i][1] = -1;
             i++;
         }
@@ -97,16 +107,16 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
 
-        for (int i = 0;i<NUM_ANTS_EASY;i++) {
+        for (int i = 0;i<num_ants;i++) {
            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
            }
             if (antRelease[i][1] == 0) {
-                activeAnts[i][0] += interval * X_ANT_SPEED_EASY;
+                activeAnts[i][0] += interval * x_speed;
                 if ((toggleY == 1) && (activeAnts[i][1] < (screenHeight * .8))) {
-                    activeAnts[i][1] += interval * Y_ANT_SPEED_EASY;
+                    activeAnts[i][1] += interval * y_speed;
                 } else if ((toggleY != 1) && (activeAnts[i][1] > (screenHeight * .2))) {
-                    activeAnts[i][1] += -1* interval * Y_ANT_SPEED_EASY;
+                    activeAnts[i][1] += -1* interval * y_speed;
                 }
                 drawAnt(activeAnts[i][0], activeAnts[i][1], canvas);
             }
@@ -116,10 +126,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
-        for (int i=0;i<NUM_ANTS_EASY;i++) {
+        for (int i=0;i<num_ants;i++) {
             if ((Math.abs(activeAnts[i][0] - x) < 30) && (Math.abs(activeAnts[i][1] - y) < 30)) {
                 antRelease[i][1] = -2;//ant killed, assigned -2
-                antRelease[i][0] = (int) TIME_EASY + 1;
+                antRelease[i][0] = (int) time_ants + 1;
             }
         }
 
@@ -155,8 +165,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //count how many ants made it to the basket
     private int countSuccess() {
         successfulAnts = 0;
-        for (int i=0;i<NUM_ANTS_EASY;i++) {
-            if ((antRelease[i][0] == (int) TIME_EASY +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
+        for (int i=0;i<num_ants;i++) {
+            if ((antRelease[i][0] == (int) time_ants +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
                 successfulAnts++;
             }
         }
@@ -167,17 +177,17 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private boolean checkAntStatus() {
         int countDead = 0;
         int countDoneAnts = 0;
-        for (int i=0;i<NUM_ANTS_EASY;i++) {
+        for (int i=0;i<num_ants;i++) {
             countDead += antRelease[i][1];
-            if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) TIME_EASY + 1)) {
+            if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) time_ants + 1)) {
                 countDoneAnts++;
             }
             if ((activeAnts[i][0] > (screenWidth * .85))&&(antRelease[i][1]==0)) { //ant made it to the picnic basket
                 antRelease[i][1]= -1; //ant returned to pre game status
-                antRelease[i][0]= (int) TIME_EASY + 1; //ant wont' be released during this game.
+                antRelease[i][0]= (int) time_ants + 1; //ant wont' be released during this game.
             }
         }
-        if ((countDoneAnts == NUM_ANTS_EASY) || (countDead == -2* NUM_ANTS_EASY)) return true;
+        if ((countDoneAnts == num_ants) || (countDead == -2* num_ants)) return true;
         else return false;
     }
 
@@ -200,8 +210,19 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void startNewGame()
     {
+       if (difficultyLevel) {
+           x_speed = X_ANT_SPEED_HARD;
+           y_speed = Y_ANT_SPEED_HARD;
+           num_ants = NUM_ANTS_HARD;
+           time_ants = TIME_HARD;
+       } else {
+           x_speed = X_ANT_SPEED_EASY;
+           y_speed = Y_ANT_SPEED_EASY;
+           num_ants = NUM_ANTS_EASY;
+           time_ants = TIME_EASY;
+       }
 
-        timeLeft = TIME_EASY; // start the countdown at 10 seconds
+        timeLeft = time_ants; // start the countdown at 10 seconds
         totalElapsedTime=0;
 
         populateAnts();
@@ -261,16 +282,16 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                 } // end anonymous inner class
                         ); // end call to setPositiveButton
                        builder.setNegativeButton(R.string.return_to_main,
-                                new DialogInterface.OnClickListener() {
+                               new DialogInterface.OnClickListener() {
 
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialogIsDisplayed=false;
-                                        stopGame();
-                                        Intent myIntent = new Intent(getContext(), SplashActivity.class);
-                                        startActivityForResult(myIntent, 0);
-                                    }
-                                });
+                                   @Override
+                                   public void onClick(DialogInterface dialog, int which) {
+                                       dialogIsDisplayed = false;
+                                       stopGame();
+                                       Intent myIntent = new Intent(getContext(), SplashActivity.class);
+                                       startActivityForResult(myIntent, 0);
+                                   }
+                               });
 
                         return builder.create(); // return the AlertDialog
                     } // end method onCreateDialog
