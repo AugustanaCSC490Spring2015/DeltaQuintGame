@@ -26,7 +26,6 @@ import android.widget.Switch;
 
 import java.util.Random;
 
-
 public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 {
     private static final String TAG = "PicnicWars"; // for Log.w(TAG, ...)
@@ -68,11 +67,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Paint antPaint;
 
     private Bitmap drawing;
-    //private Bitmap ant;
-
-    final int PREF_MODE = 0;
-    SharedPreferences preferenceSettings;
-    SharedPreferences.Editor preferenceEditor;
+    boolean dif;
 
 
     public MainGameView(Context context, AttributeSet atts)
@@ -217,15 +212,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void startNewGame()
     {
-        //difficultySwitch  = (Switch) findViewById(R.id.difficultySwitch);
-        //difficultyLevel = difficultySwitch.isChecked();
+        dif = false;
 
-        preferenceSettings = getContext().getSharedPreferences("current",PREF_MODE);
-        preferenceEditor = preferenceSettings.edit();
-
-        boolean tempStatus = preferenceSettings.getBoolean("Current",true);
-
-       if (difficultyLevel) {
+       if (dif) {
            x_speed = X_ANT_SPEED_HARD;
            y_speed = Y_ANT_SPEED_HARD;
            num_ants = NUM_ANTS_HARD;

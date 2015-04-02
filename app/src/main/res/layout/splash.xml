@@ -4,8 +4,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="5"
-    android:rowCount="7"
+    android:columnCount="6"
+    android:rowCount="8"
     android:id="@+id/Grid_Layout"
     tools:context=".MainActivity"
     android:background="@drawable/title_page">
@@ -25,15 +25,23 @@
         android:layout_height="wrap_content"
         android:text="@string/start_game_button"
         android:id="@+id/buttonStartGame"
-        android:layout_column="4"
-        android:layout_row="6"
+        android:layout_column="5"
+        android:layout_row="7"
         android:onClick="mainGameView"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play game in Hard Mode?"
+        android:id="@+id/hardCheckBox"
+        android:layout_row="6"
+        android:layout_column="3" />
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/difficultySwitch"
-        android:layout_row="6"
+        android:layout_row="7"
         android:layout_column="1"
         android:textOff="Easy"
         android:textOn="Hard"/>
