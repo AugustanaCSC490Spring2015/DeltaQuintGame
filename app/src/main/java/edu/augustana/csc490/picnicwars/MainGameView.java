@@ -4,11 +4,13 @@ package edu.augustana.csc490.picnicwars;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -67,6 +69,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private Bitmap drawing;
     //private Bitmap ant;
+
+    final int PREF_MODE = 0;
+    SharedPreferences preferenceSettings;
+    SharedPreferences.Editor preferenceEditor;
+
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -210,9 +217,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void startNewGame()
     {
+        //difficultySwitch  = (Switch) findViewById(R.id.difficultySwitch);
+        //difficultyLevel = difficultySwitch.isChecked();
 
-        difficultySwitch  = (Switch) findViewById(R.id.difficultySwitch);
-        difficultyLevel = difficultySwitch.isChecked();
+        preferenceSettings = getContext().getSharedPreferences("current",PREF_MODE);
+        preferenceEditor = preferenceSettings.edit();
+
+        boolean tempStatus = preferenceSettings.getBoolean("Current",true);
 
        if (difficultyLevel) {
            x_speed = X_ANT_SPEED_HARD;
