@@ -48,9 +48,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private int NUM_ANTS_HARD = 30;
     private double TIME_HARD = 30;
 
-    private Switch difficultySwitch;
-    private boolean difficultyLevel;
-
     private int[][] activeAnts;
     private int[][] antRelease;
     private double timeLeft; // time remaining in seconds
@@ -207,7 +204,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         startNewGame();
 
         textPaint.setTextSize(w / 20); // text size 1/20 of screen width
-        // textPaint.setAntiAlias(true); // smoothes the text
+
     }
 
     public void startNewGame()
