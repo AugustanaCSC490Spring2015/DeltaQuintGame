@@ -15,18 +15,18 @@ import android.widget.Toast;
  * Created by Reed on 4/1/2015.
  */
 public class SplashActivity extends Activity {
-
+    private SharedPreferences difficulty;
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
 
-        SharedPreferences settings = getSharedPreferences("Difficulty", MODE_PRIVATE);
-        SharedPreferences.Editor prefEditor = settings.edit();
-        prefEditor.putString("Difficlty", "Hard");
-        prefEditor.commit();
+        difficulty = getSharedPreferences("difficulty", MODE_PRIVATE);
+
+        SharedPreferences.Editor prefEditor = difficulty.edit();
+        prefEditor.putString("difficulty", "Easy");
+        prefEditor.apply();
 
         CheckBox hardDif = (CheckBox) findViewById(R.id.hardCheckBox);
         Button next = (Button) findViewById(R.id.buttonStartGame);
@@ -40,26 +40,29 @@ public class SplashActivity extends Activity {
 
         hardDif.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                toggleDifficulty();
+                toggleDif();
             }
         });
+    }
+        private void toggleDif() {
+            difficulty = getSharedPreferences("difficulty",MODE_PRIVATE);
+            SharedPreferences.Editor prefEditor = difficulty.edit();
+            String dif = difficulty.getString("difficulty","");
+            if (dif.equals("Easy")) {
+                prefEditor.remove("difficulty");
+                prefEditor.putString("difficulty","Hard");
+            } else {
+                prefEditor.remove("difficulty");
+                prefEditor.putString("difficulty","Easy");
+            }
+            prefEditor.apply();
+            Context context = getApplicationContext();
+            Toast toast = Toast.makeText(context,difficulty.getString("difficulty",""), Toast.LENGTH_LONG);
+            toast.show();
 
     }
 
-        public void toggleDifficulty() {
-            SharedPreferences sharedPref = getSharedPreferences("Difficulty", MODE_PRIVATE);
-            String tempDif = sharedPref.getString("Difficulty", "Easy");
-            SharedPreferences.Editor prefEditor = sharedPref.edit();
-            prefEditor.remove("Difficulty");
-            if (tempDif.equals("Hard")) {
-                prefEditor.putString("Difficulty","Easy");
-            } else {
-                prefEditor.putString("Difficulty","Hard");
-            }
-
-            Context context = getApplicationContext();
-            Toast toast = Toast.makeText(context,"Test",Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
 }
+
+
+

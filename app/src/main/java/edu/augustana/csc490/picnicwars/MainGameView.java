@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -66,12 +67,15 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap drawing;
     boolean dif;
 
+   // SharedPreferences settings;
 
     public MainGameView(Context context, AttributeSet atts)
     {
 
         super(context, atts);
         mainActivity = (Activity) context;
+
+       // SharedPreferences settings = getSharedPreferences("Difficulty",Context.MODE_PRIVATE);
 
         drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
 
@@ -202,15 +206,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         drawing = drawing.createScaledBitmap(drawing,w,h,true);
 
         startNewGame();
-
         textPaint.setTextSize(w / 20); // text size 1/20 of screen width
 
     }
 
     public void startNewGame()
     {
-        dif = false;
-
        if (dif) {
            x_speed = X_ANT_SPEED_HARD;
            y_speed = Y_ANT_SPEED_HARD;
@@ -299,15 +300,14 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 }; // end DialogFragment anonymous inner class
                 // in GUI thread, use FragmentManager to display the DialogFragment
                 mainActivity.runOnUiThread(
-                new Runnable() {
-                    public void run()
-                    {
-                        dialogIsDisplayed = true;
-                        gameResult.setCancelable(false); // modal dialog
-                        gameResult.show(mainActivity.getFragmentManager(), "results");
-                    }
-                } // end Runnable
-        ); // end call to runOnUiThread
+                        new Runnable() {
+                            public void run() {
+                                dialogIsDisplayed = true;
+                                gameResult.setCancelable(false); // modal dialog
+                                gameResult.show(mainActivity.getFragmentManager(), "results");
+                            }
+                        } // end Runnable
+                ); // end call to runOnUiThread
     } // end method showGameOverDialog
 
     public void insertTime(Canvas canvas) {

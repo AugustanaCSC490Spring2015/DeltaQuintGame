@@ -22,7 +22,6 @@ public final class R {
     public static final class id {
         public static final int Grid_Layout=0x7f080003;
         public static final int buttonStartGame=0x7f080005;
-        public static final int difficultySwitch=0x7f080007;
         public static final int gameStarterFragment=0x7f080001;
         public static final int hardCheckBox=0x7f080006;
         public static final int mainGameView=0x7f080002;
@@ -41,17 +40,19 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
-        public static final int difficulty_easy=0x7f060001;
-        public static final int difficulty_hard=0x7f060002;
-        public static final int difficulty_switch=0x7f060003;
-        public static final int lose=0x7f060004;
-        public static final int reset_button_string=0x7f060005;
-        public static final int results=0x7f060006;
-        public static final int return_to_main=0x7f060007;
-        public static final int start_game_button=0x7f060008;
-        public static final int string_difficulty=0x7f060009;
-        public static final int time_left=0x7f06000a;
-        public static final int win=0x7f06000b;
+        public static final int choose_difficulty=0x7f060001;
+        public static final int difficulty_easy=0x7f060002;
+        public static final int difficulty_hard=0x7f060003;
+        public static final int difficulty_meassage=0x7f060004;
+        public static final int difficulty_switch=0x7f060005;
+        public static final int lose=0x7f060006;
+        public static final int reset_button_string=0x7f060007;
+        public static final int results=0x7f060008;
+        public static final int return_to_main=0x7f060009;
+        public static final int start_game_button=0x7f06000a;
+        public static final int string_difficulty=0x7f06000b;
+        public static final int time_left=0x7f06000c;
+        public static final int win=0x7f06000d;
     }
     public static final class style {
         /** 
