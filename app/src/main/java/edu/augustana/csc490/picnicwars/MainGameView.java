@@ -4,7 +4,6 @@ package edu.augustana.csc490.picnicwars;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -22,11 +21,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import java.util.Random;
-
+/*
+ * Created by Reed Kottke:  main game view of Picnic wars
+ *      Skeleton for code: Forrest Stonedahl - http://moodle.augustana.edu/course/view.php?id=7207 [GameStarter.zip]
+ */
 public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 {
     private static final String TAG = "PicnicWars"; // for Log.w(TAG, ...)
@@ -34,12 +34,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private GameThread gameThread; // runs the main game loop
     private Activity mainActivity; // keep a reference to the main Activity
 
-    private boolean isGameOver = true;
-    private boolean dialogIsDisplayed = false;
+    private boolean isGameOver = true; // set to false when the game should no longer run
+    private boolean dialogIsDisplayed = false;// set to false to hide the dialog
 
-    private int screenWidth;
+    private int screenWidth; //for variable screen size
     private int screenHeight;
 
+    //variables for the ant speed, num ants and time of easy v. hard game settings
     private double X_ANT_SPEED_EASY = 200;
     private double Y_ANT_SPEED_EASY = 25;
     private double X_ANT_SPEED_HARD = 300;
@@ -49,25 +50,29 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private int NUM_ANTS_HARD = 30;
     private double TIME_HARD = 30;
 
-    private int[][] activeAnts;
-    private int[][] antRelease;
+    private int[][] activeAnts; //2d array of the x and y position of active ants
+    private int[][] antRelease; //2d array of the [0] time of ant release and [1] status of the ant
+                                // -1 means ant not created or successfully in basket,
+                                // 0 means ant is on the screen
+                                // 1 means ant was killed by player
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
-    private int successfulAnts;//ants that get to the basket
-    private double x_speed;
-    private double y_speed;
-    private int num_ants;
-    private double time_ants;
+    private int successfulAnts;//count of ants that get to the basket
+    private double x_speed; //depending on the game setting, this variable will be set to the constant ant speed
+    private double y_speed; //depending on the game setting, this variable will be set to the constant ant speed
+    private int num_ants; //depedning on the game setting, this variable will be the max iterator of loops/number of ants
+    private double time_ants; //depending on the game setting, this variable will represent game time.
 
-    private Paint myPaint;
-    private Paint backgroundPaint;
-    private Paint textPaint;
-    private Paint antPaint;
+    private Paint myPaint; // paint for general drawing
+    private Paint backgroundPaint; //paint for background
+    private Paint textPaint; //paint for text
+    private Paint antPaint; //paint for ants
 
-    private Bitmap drawing;
-    boolean dif;
+    private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
+                            //source: http://www.fotosearch.com/clip-art/picnic-basket.html
+    boolean dif; //boolean to represent difficulty: true is hard, false iseasy
 
-    private SharedPreferences difficulty;
+    private SharedPreferences difficulty; //to access the sharedPreferences which represents chosen difficulty
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -93,6 +98,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
+    //populate the ants with random y position and random start times.
     public void populateAnts() {
         int i = 0;
         antRelease = new int[num_ants][2];
@@ -107,6 +113,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         antRelease[0][0] = 1;
     }
 
+    //if ants are on the screen, update them to move at variable speeds
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
 
@@ -138,6 +145,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
+    //draw the ants
     private void drawAnt(float x, float y, Canvas canvas) {
         float radiusMiddle = 4;
         float radiusHead = 10;
@@ -210,11 +218,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
-    public void startNewGame()
-    {
+    //start a new game, check to see what the difficulty constants should be set to, reset timer
+    public void startNewGame() {
        String difString = difficulty.getString("difficulty","");
-       Toast toast = Toast.makeText(getContext(),difString,Toast.LENGTH_LONG);
-       toast.show();
 
        if (difString.equals("Easy")){
            dif = false;
@@ -246,6 +252,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    //called in game thread loop, creates view, check to see if game should end
     public void updateView(Canvas canvas, double elapsedTimeMS) {
         double interval = elapsedTimeMS / 1000.0; // convert to seconds
 
@@ -320,12 +327,14 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 ); // end call to runOnUiThread
     } // end method showGameOverDialog
 
+    //add the time remaining and number of ants in basket to screen
     public void insertTime(Canvas canvas) {
         canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
         canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
     }
 
     //copied from http://stackoverflow.com/questions/20389890/generating-a-random-number-between-1-and-10-java
+    //create random variables method for starting y position and starting time of ants
     public static int randInt(int min, int max) {
 
         // Usually this can be a field rather than a method variable
@@ -385,6 +394,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    //when a touch or click happens, get the position of the touch
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         int xTouch = 0;
@@ -420,7 +430,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             threadIsRunning = running;
         }
 
-
+        //main running thread to populate view continuously
         @Override
         public void run()
         {
