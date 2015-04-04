@@ -22,13 +22,23 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
 
+        CheckBox hardDif = (CheckBox) findViewById(R.id.hardCheckBox);
+
         difficulty = getSharedPreferences("difficulty", MODE_PRIVATE);
 
-        SharedPreferences.Editor prefEditor = difficulty.edit();
-        prefEditor.putString("difficulty", "Easy");
-        prefEditor.apply();
+        String tempDif = difficulty.getString("difficulty","");
 
-        CheckBox hardDif = (CheckBox) findViewById(R.id.hardCheckBox);
+        if (tempDif.equals("Hard")) {
+            hardDif.setChecked(true);
+        }
+
+        SharedPreferences.Editor prefEditor = difficulty.edit();
+
+        if (!tempDif.equals("Hard")) {
+            prefEditor.putString("difficulty", "Easy");
+            prefEditor.apply();
+        }
+
         Button next = (Button) findViewById(R.id.buttonStartGame);
 
         next.setOnClickListener(new View.OnClickListener() {

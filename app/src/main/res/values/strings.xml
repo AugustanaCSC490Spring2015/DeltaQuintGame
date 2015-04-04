@@ -15,4 +15,5 @@
     <string name="string_difficulty">Difficulty:</string>
     <string name="choose_difficulty">Choose Difficulty</string>
     <string name="difficulty_meassage">Which difficulty would you like?</string>
+    <string name="instructions">Instructions: Kill (tap or click) the ants before they get to your picnic basket!!</string>
 </resources>

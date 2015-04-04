@@ -67,7 +67,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap drawing;
     boolean dif;
 
-   // SharedPreferences settings;
+    private SharedPreferences difficulty;
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -75,7 +75,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         super(context, atts);
         mainActivity = (Activity) context;
 
-       // SharedPreferences settings = getSharedPreferences("Difficulty",Context.MODE_PRIVATE);
+        difficulty = getContext().getSharedPreferences("difficulty",Context.MODE_PRIVATE);
 
         drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
 
@@ -212,6 +212,16 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void startNewGame()
     {
+       String difString = difficulty.getString("difficulty","");
+       Toast toast = Toast.makeText(getContext(),difString,Toast.LENGTH_LONG);
+       toast.show();
+
+       if (difString.equals("Easy")){
+           dif = false;
+       } else {
+           dif = true;
+       }
+
        if (dif) {
            x_speed = X_ANT_SPEED_HARD;
            y_speed = Y_ANT_SPEED_HARD;
