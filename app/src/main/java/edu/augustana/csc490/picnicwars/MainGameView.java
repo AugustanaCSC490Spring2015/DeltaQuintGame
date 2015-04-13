@@ -1,5 +1,4 @@
-// CannonView.java
-// Displays and controls the Cannon Game
+// Displays and controls the Picnic Wars
 package edu.augustana.csc490.picnicwars;
 
 import android.app.Activity;
@@ -22,6 +21,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 /*
  * Created by Reed Kottke:  main game view of Picnic wars
@@ -50,11 +51,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private int NUM_ANTS_HARD = 30;
     private double TIME_HARD = 30;
 
+    private List<Ants> allAnts; //List of all Ants containing their position and properties
+
     private int[][] activeAnts; //2d array of the x and y position of active ants
     private int[][] antRelease; //2d array of the [0] time of ant release and [1] status of the ant
-                                // -1 means ant not created or successfully in basket,
-                                // 0 means ant is on the screen
-                                // 1 means ant was killed by player
+    // -1 means ant not created or successfully in basket,
+    // 0 means ant is on the screen
+    // 1 means ant was killed by player
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
     private int successfulAnts;//count of ants that get to the basket
@@ -69,7 +72,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Paint antPaint; //paint for ants
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
-                            //source: http://www.fotosearch.com/clip-art/picnic-basket.html
+    //source: http://www.fotosearch.com/clip-art/picnic-basket.html
     boolean dif; //boolean to represent difficulty: true is hard, false iseasy
 
     private SharedPreferences difficulty; //to access the sharedPreferences which represents chosen difficulty
@@ -95,11 +98,17 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         antPaint = new Paint();
         antPaint.setColor(Color.BLACK);
         antPaint.setStrokeWidth(4);
+        allAnts = new ArrayList<Ants>();
 
     }
 
     //populate the ants with random y position and random start times.
     public void populateAnts() {
+        for(int i = 0; i < num_ants; i++)
+        {
+            allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, (randInt(3, (int) (time_ants  - 10)))));
+        }
+
         int i = 0;
         antRelease = new int[num_ants][2];
 
@@ -117,10 +126,32 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
 
+        for(Ants ant:allAnts)
+        {
+            if(ant.time <= totalElapsedTime)
+            {
+                ant.health = 0;
+            }
+            if(ant.health == 0)
+            {
+                ant.xCoordinate += interval * x_speed;
+                if(toggleY == 1 && ant.xCoordinate < (screenHeight * .8))
+                {
+                    ant.yCoordinate += interval * y_speed;
+                }
+                else if(toggleY != 1 && (ant.yCoordinate > (screenHeight * .2)))
+                {
+                    ant.yCoordinate += -1 * interval * y_speed;
+                }
+                drawAnt(ant.xCoordinate, ant.yCoordinate, canvas);
+            }
+
+
+        }
         for (int i = 0;i<num_ants;i++) {
-           if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
+            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
-           }
+            }
             if (antRelease[i][1] == 0) {
                 activeAnts[i][0] += interval * x_speed;
                 if ((toggleY == 1) && (activeAnts[i][1] < (screenHeight * .8))) {
@@ -220,25 +251,25 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //start a new game, check to see what the difficulty constants should be set to, reset timer
     public void startNewGame() {
-       String difString = difficulty.getString("difficulty","");
+        String difString = difficulty.getString("difficulty","");
 
-       if (difString.equals("Easy")){
-           dif = false;
-       } else {
-           dif = true;
-       }
+        if (difString.equals("Easy")){
+            dif = false;
+        } else {
+            dif = true;
+        }
 
-       if (dif) {
-           x_speed = X_ANT_SPEED_HARD;
-           y_speed = Y_ANT_SPEED_HARD;
-           num_ants = NUM_ANTS_HARD;
-           time_ants = TIME_HARD;
-       } else {
-           x_speed = X_ANT_SPEED_EASY;
-           y_speed = Y_ANT_SPEED_EASY;
-           num_ants = NUM_ANTS_EASY;
-           time_ants = TIME_EASY;
-       }
+        if (dif) {
+            x_speed = X_ANT_SPEED_HARD;
+            y_speed = Y_ANT_SPEED_HARD;
+            num_ants = NUM_ANTS_HARD;
+            time_ants = TIME_HARD;
+        } else {
+            x_speed = X_ANT_SPEED_EASY;
+            y_speed = Y_ANT_SPEED_EASY;
+            num_ants = NUM_ANTS_EASY;
+            time_ants = TIME_EASY;
+        }
 
         timeLeft = time_ants; // start the countdown at 10 seconds
         totalElapsedTime=0;
@@ -274,7 +305,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             isGameOver = true;
             gameThread.setRunning(false);
             if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
-            showGameOverDialog(R.string.win); //show winning dialog
+                showGameOverDialog(R.string.win); //show winning dialog
         }
     }
 
@@ -300,31 +331,31 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                     }
                                 } // end anonymous inner class
                         ); // end call to setPositiveButton
-                       builder.setNegativeButton(R.string.return_to_main,
-                               new DialogInterface.OnClickListener() {
+                        builder.setNegativeButton(R.string.return_to_main,
+                                new DialogInterface.OnClickListener() {
 
-                                   @Override
-                                   public void onClick(DialogInterface dialog, int which) {
-                                       dialogIsDisplayed = false;
-                                       stopGame();
-                                       Intent myIntent = new Intent(getContext(), SplashActivity.class);
-                                       startActivityForResult(myIntent, 0);
-                                   }
-                               });
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialogIsDisplayed = false;
+                                        stopGame();
+                                        Intent myIntent = new Intent(getContext(), SplashActivity.class);
+                                        startActivityForResult(myIntent, 0);
+                                    }
+                                });
 
                         return builder.create(); // return the AlertDialog
                     } // end method onCreateDialog
                 }; // end DialogFragment anonymous inner class
-                // in GUI thread, use FragmentManager to display the DialogFragment
-                mainActivity.runOnUiThread(
-                        new Runnable() {
-                            public void run() {
-                                dialogIsDisplayed = true;
-                                gameResult.setCancelable(false); // modal dialog
-                                gameResult.show(mainActivity.getFragmentManager(), "results");
-                            }
-                        } // end Runnable
-                ); // end call to runOnUiThread
+        // in GUI thread, use FragmentManager to display the DialogFragment
+        mainActivity.runOnUiThread(
+                new Runnable() {
+                    public void run() {
+                        dialogIsDisplayed = true;
+                        gameResult.setCancelable(false); // modal dialog
+                        gameResult.show(mainActivity.getFragmentManager(), "results");
+                    }
+                } // end Runnable
+        ); // end call to runOnUiThread
     } // end method showGameOverDialog
 
     //add the time remaining and number of ants in basket to screen

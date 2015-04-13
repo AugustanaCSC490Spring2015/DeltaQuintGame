@@ -2,25 +2,25 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Reed\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
-        <dex dex="C:\Users\Reed\Documents\Augustana\AndroidStudioProjects\PicnicWars\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-12ccbea11b8289f7c76a3d06564ddf7d2ef4eab4.jar" />
-    </item>
-    <item
-        jar="C:\Users\Reed\Documents\Augustana\AndroidStudioProjects\PicnicWars\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
-        <dex dex="C:\Users\Reed\Documents\Augustana\AndroidStudioProjects\PicnicWars\app\build\intermediates\pre-dexed\debug\classes-df5772de6ed73d660ebe7d71439d3ad0bddff916.jar" />
-    </item>
-    <item
-        jar="C:\Users\Reed\Documents\Augustana\AndroidStudioProjects\PicnicWars\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\libs\internal_impl-21.0.3.jar"
+        jar="H:\AndroidStudioProjects\DeltaQuintGame\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\libs\internal_impl-21.0.3.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="C:\Users\Reed\Documents\Augustana\AndroidStudioProjects\PicnicWars\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-f9c192234ec91b653f9aac6fd348700e8e8b71c8.jar" />
+        <dex dex="H:\AndroidStudioProjects\DeltaQuintGame\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-4c6c8e853f15f2dea21495b9279840b53e7f55ad.jar" />
+    </item>
+    <item
+        jar="C:\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="H:\AndroidStudioProjects\DeltaQuintGame\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-99c1ccd53a7fa88549c32ac544faa9e96cd17557.jar" />
+    </item>
+    <item
+        jar="H:\AndroidStudioProjects\DeltaQuintGame\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="H:\AndroidStudioProjects\DeltaQuintGame\app\build\intermediates\pre-dexed\debug\classes-772b8ae3e0a07d57472780c97e903c012312123f.jar" />
     </item>
 
 </items>
