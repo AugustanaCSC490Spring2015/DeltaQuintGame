@@ -109,6 +109,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, (randInt(3, (int) (time_ants  - 10)))));
         }
 
+
         int i = 0;
         antRelease = new int[num_ants][2];
 
@@ -145,10 +146,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 }
                 drawAnt(ant.xCoordinate, ant.yCoordinate, canvas);
             }
-
-
+            toggleY = randInt(0,1);
         }
-        for (int i = 0;i<num_ants;i++) {
+        /*for (int i = 0;i<num_ants;i++) {
             if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
                 antRelease[i][1] = 0;
             }
@@ -163,6 +163,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
             toggleY = randInt(0,1);
         }
+        */
     }
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
