@@ -53,11 +53,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private List<Ants> allAnts; //List of all Ants containing their position and properties
 
-    private int[][] activeAnts; //2d array of the x and y position of active ants
-    private int[][] antRelease; //2d array of the [0] time of ant release and [1] status of the ant
-    // -1 means ant not created or successfully in basket,
-    // 0 means ant is on the screen
-    // 1 means ant was killed by player
+    //private int[][] activeAnts; //2d array of the x and y position of active ants
+    //private int[][] antRelease; //2d array of the [0] time of ant release and [1] status of the ant
+        // -1 means ant not created or successfully in basket,
+        // 0 means ant is on the screen
+        // 1 means ant was killed by player
     private double timeLeft; // time remaining in seconds
     private double totalElapsedTime; // elapsed seconds
     private int successfulAnts;//count of ants that get to the basket
@@ -106,11 +106,14 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     public void populateAnts() {
         for(int i = 0; i < num_ants; i++)
         {
-            allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, (randInt(3, (int) (time_ants  - 10)))));
+            int timer = (randInt(3, (int) (time_ants  - 10)));
+            if(i == 0){
+                timer = 1;
+            }
+            allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
         }
 
-
-        int i = 0;
+        /*int i = 0;
         antRelease = new int[num_ants][2];
 
         for (int[] ints : activeAnts = new int[num_ants][2]) {
@@ -120,7 +123,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             antRelease[i][1] = -1;
             i++;
         }
-        antRelease[0][0] = 1;
+        */
+        //antRelease[0][0] = 1;
     }
 
     //if ants are on the screen, update them to move at variable speeds
@@ -168,12 +172,20 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
-        for (int i=0;i<num_ants;i++) {
-            if ((Math.abs(activeAnts[i][0] - x) < 30) && (Math.abs(activeAnts[i][1] - y) < 30)) {
-                antRelease[i][1] = -2;//ant killed, assigned -2
-                antRelease[i][0] = (int) time_ants + 1;
-            }
+        //for each ant in the list of ants, check to see if an ant is touched. If an ant is touched, it's health is reset.
+        for(Ants ant: allAnts)
+        {
+            if((Math.abs(ant.xCoordinate - x) < 30) && (Math.abs(ant.yCoordinate - y) < 30)){
+            ant.health = -2;//ant killed, assigned -2
+            ant.time = (int) time_ants + 1;//set Ants time to 'respawn' to after game so they never appear again
         }
+        }
+        //for (int i=0;i<num_ants;i++) {
+        //    if ((Math.abs(activeAnts[i][0] - x) < 30) && (Math.abs(activeAnts[i][1] - y) < 30)) {
+        //        antRelease[i][1] = -2;//ant killed, assigned -2
+        //        antRelease[i][0] = (int) time_ants + 1;
+        //    }
+        //}
 
     }
 
@@ -208,11 +220,17 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //count how many ants made it to the basket
     private int countSuccess() {
         successfulAnts = 0;
-        for (int i=0;i<num_ants;i++) {
-            if ((antRelease[i][0] == (int) time_ants +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
+        for(Ants ant: allAnts)
+        {
+            if(((ant.health != -2))){
                 successfulAnts++;
             }
         }
+        //  for (int i=0;i<num_ants;i++) {
+        //     if ((antRelease[i][0] == (int) time_ants +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
+        //          successfulAnts++;
+        //     }
+        //  }
         return successfulAnts;
     }
 
@@ -220,7 +238,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private boolean checkAntStatus() {
         int countDead = 0;
         int countDoneAnts = 0;
-        for (int i=0;i<num_ants;i++) {
+        for(Ants ant: allAnts)
+        {
+            countDead += ant.health;
+            if((ant.health <= -1) && (ant.time == (int) time_ants + 1)){
+                countDoneAnts++;
+            }
+            if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
+                ant.health = -1;//ant returned to pre game status
+                ant.time = (int) time_ants + 1; //ant wont' be released during this game.
+            }
+        }
+        /*for (int i=0;i<num_ants;i++) {
             countDead += antRelease[i][1];
             if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) time_ants + 1)) {
                 countDoneAnts++;
@@ -229,7 +258,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 antRelease[i][1]= -1; //ant returned to pre game status
                 antRelease[i][0]= (int) time_ants + 1; //ant wont' be released during this game.
             }
-        }
+        }*/
         if ((countDoneAnts == num_ants) || (countDead == -2* num_ants)) return true;
         else return false;
     }
@@ -274,7 +303,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         timeLeft = time_ants; // start the countdown at 10 seconds
         totalElapsedTime=0;
+        successfulAnts = 0;
 
+        allAnts.clear();
         populateAnts();
 
         if (isGameOver)  {
@@ -321,7 +352,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         // create dialog displaying String resource for messageId
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(getResources().getString(messageId));
-                        builder.setMessage(getResources().getString(R.string.results, countSuccess()));
+                        builder.setMessage(getResources().getString(R.string.results, successfulAnts));
                         builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
