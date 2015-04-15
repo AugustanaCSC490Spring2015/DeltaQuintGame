@@ -222,7 +222,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         successfulAnts = 0;
         for(Ants ant: allAnts)
         {
-            if(((ant.health != -2))){
+            if((ant.health != -2)){
                 successfulAnts++;
             }
         }
