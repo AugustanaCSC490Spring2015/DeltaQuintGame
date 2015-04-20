@@ -13,14 +13,14 @@ public class Ants {
     public int xCoordinate;
     public int yCoordinate;
     public int health;
-    public int time;
+    public double time;
 
     private Paint hardPaint;
     private Paint mediumPaint;
     private Paint easyPaint;
     private Paint blackPaint;
 
-    public Ants(int x, int y, int color, int health, int time)
+    public Ants(int x, int y, int color, int health, double time)
     {
         xCoordinate = x;
         yCoordinate = y;
