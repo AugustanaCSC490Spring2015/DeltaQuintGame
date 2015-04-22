@@ -15,11 +15,6 @@ public class Ants {
     public int health;
     public double time;
 
-    private Paint hardPaint;
-    private Paint mediumPaint;
-    private Paint easyPaint;
-    private Paint blackPaint;
-
     public Ants(int x, int y, int color, int health, double time)
     {
         xCoordinate = x;

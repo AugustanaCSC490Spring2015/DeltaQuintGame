@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Switch;
 
 /**
  * Created by Reed on 4/1/2015.
@@ -17,6 +18,7 @@ import android.widget.CheckBox;
  */
 public class SplashActivity extends Activity {
     private SharedPreferences difficulty;
+    private SharedPreferences gameMode;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -24,10 +26,13 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash);
 
         CheckBox hardDif = (CheckBox) findViewById(R.id.hardCheckBox);
+        Switch survivalMode = (Switch) findViewById(R.id.UISurvivalMode);
 
         difficulty = getSharedPreferences("difficulty", MODE_PRIVATE);
+        gameMode = getSharedPreferences("mode", MODE_PRIVATE);
 
         String tempDif = difficulty.getString("difficulty","");
+        String tempMode = gameMode.getString("mode","");
 
         if (tempDif.equals("Hard")) {
             hardDif.setChecked(true);
@@ -38,6 +43,16 @@ public class SplashActivity extends Activity {
         if (!tempDif.equals("Hard")) {
             prefEditor.putString("difficulty", "Easy");
             prefEditor.apply();
+        }
+
+        if(tempMode.equals("Survival")){
+            survivalMode.setChecked(true);
+        }
+        SharedPreferences.Editor modeEditor = gameMode.edit();
+
+        if(!tempMode.equals("Survival")){
+            modeEditor.putString("mode", "Classic");
+            modeEditor.apply();
         }
 
         Button next = (Button) findViewById(R.id.buttonStartGame);
@@ -52,6 +67,11 @@ public class SplashActivity extends Activity {
         hardDif.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 toggleDif();
+            }
+        });
+        survivalMode.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                toggleMode();
             }
         });
     }
@@ -70,6 +90,20 @@ public class SplashActivity extends Activity {
             }
             prefEditor.apply();
     }
+       private void toggleMode() {
+           gameMode = getSharedPreferences("mode", MODE_PRIVATE);
+           SharedPreferences.Editor modeEditor = gameMode.edit();
+           String mode = gameMode.getString("mode","");
+           if(mode.equals("Classic")){
+               modeEditor.remove("mode");
+               modeEditor.putString("mode", "Survival");
+           }else{
+               modeEditor.remove("mode");
+               modeEditor.putString("mode", "Classic");
+           }
+
+
+       }
 
 }
 

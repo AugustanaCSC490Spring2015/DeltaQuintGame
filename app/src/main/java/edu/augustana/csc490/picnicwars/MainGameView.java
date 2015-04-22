@@ -24,6 +24,9 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /*
  * Created by Reed Kottke:  main game view of Picnic wars
  *      Skeleton for code: Forrest Stonedahl - http://moodle.augustana.edu/course/view.php?id=7207 [GameStarter.zip]
@@ -74,13 +77,19 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //Survival Characteristics
     int score;
+    Timer timer;
+    MyTimerTask myTimerTask;
+    int seconds;
+    int level;
 
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
-    boolean dif; //boolean to represent difficulty: true is hard, false iseasy
+    boolean dif; //boolean to represent difficulty: true is hard, false is easy
+    boolean mode; //boolean to represent game modes; true is survival, false is classic
 
     private SharedPreferences difficulty; //to access the sharedPreferences which represents chosen difficulty
+    private SharedPreferences gameMode; // To access which game Mode to implement
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -89,6 +98,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         mainActivity = (Activity) context;
 
         difficulty = getContext().getSharedPreferences("difficulty",Context.MODE_PRIVATE);
+        gameMode = getContext().getSharedPreferences("mode", Context.MODE_PRIVATE);
 
         drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
 
@@ -111,6 +121,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         allAnts = new ArrayList<Ants>();
 
+        timer = new Timer();
+        myTimerTask = new MyTimerTask();
+        timer.scheduleAtFixedRate(myTimerTask, 0, 1000);
     }
 
     //populate the ants with random y position and random start times.
@@ -307,13 +320,20 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         drawing = drawing.createScaledBitmap(drawing,w,h,true);
 
         startNewGame();
-        textPaint.setTextSize(w / 20); // text size 1/20 of screen width
+        textPaint.setTextSize(w / 25); // text size 1/25 of screen width
 
     }
 
     //start a new game, check to see what the difficulty constants should be set to, reset timer
     public void startNewGame() {
         String difString = difficulty.getString("difficulty","");
+        String modeString = gameMode.getString("mode","");
+
+        if(modeString.equals("Classic")){
+            mode = false;
+        }else{
+            mode = true;
+        }
 
         if (difString.equals("Easy")){
             dif = false;
@@ -337,6 +357,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         totalElapsedTime=0;
         successfulAnts = 0;
         score = 0;
+
+        seconds = 0;
+        level = 0;
 
         allAnts.clear();
         populateAnts();
@@ -429,9 +452,15 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         topBar.setColor(Color.rgb(64,64,64));
 
         canvas.drawRect(0,0,screenWidth, 55, topBar);
-        canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 30, 50, textPaint);
-        canvas.drawText(score + "", 100, screenWidth - 150, textPaint);
-        canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
+
+        if(mode){
+
+        }
+        else{
+            canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 50, textPaint);
+            canvas.drawText(score + "", 100, screenWidth - 150, textPaint);
+            canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
+        }
     }
 
     //copied from http://stackoverflow.com/questions/20389890/generating-a-random-number-between-1-and-10-java
@@ -566,5 +595,17 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 }
             }
         }
+    }
+    class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            seconds += 1;
+            level = seconds / 10;
+            if(level < 1){
+                level = 1;
+            }
+        }
+
     }
 }
