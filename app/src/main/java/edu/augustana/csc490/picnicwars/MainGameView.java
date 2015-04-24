@@ -131,9 +131,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         for(int i = 0; i < num_ants; i++)
         {
             int randomFireAnt = randInt(0,100);
-            int timer = (randInt(3, (int) (time_ants  - 10)));
+          //  int timer = (randInt(3, (int) (time_ants  - 10));
+           double timer = randDouble(3,(int) (time_ants - 5));
+
             if(i == 0){
-                timer = 1;
+                timer = 1.0;
             }
             allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
             if(randomFireAnt >= 95)
@@ -141,19 +143,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 allAnts.add(new Ants((int) (screenWidth * .01), randInt((int) (screenHeight *.3), (int) (screenHeight*.7)), 1, -1, timer));
             }
         }
-
-        /*int i = 0;
-        antRelease = new int[num_ants][2];
-
-        for (int[] ints : activeAnts = new int[num_ants][2]) {
-            activeAnts[i][0]=(int) (screenWidth * .01);
-            activeAnts[i][1]= randInt((int) (screenHeight*.3),(int) (screenHeight*.7));
-            antRelease[i][0] = randInt(3, (int) (time_ants  - 10));
-            antRelease[i][1] = -1;
-            i++;
-        }
-        */
-        //antRelease[0][0] = 1;
     }
 
     //if ants are on the screen, update them to move at variable speeds
@@ -191,22 +180,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
             toggleY = randInt(0,1);
         }
-        /*for (int i = 0;i<num_ants;i++) {
-            if ((antRelease[i][1] == -1) && (antRelease[i][0] <= totalElapsedTime)) {
-                antRelease[i][1] = 0;
-            }
-            if (antRelease[i][1] == 0) {
-                activeAnts[i][0] += interval * x_speed;
-                if ((toggleY == 1) && (activeAnts[i][1] < (screenHeight * .8))) {
-                    activeAnts[i][1] += interval * y_speed;
-                } else if ((toggleY != 1) && (activeAnts[i][1] > (screenHeight * .2))) {
-                    activeAnts[i][1] += -1* interval * y_speed;
-                }
-                drawAnt(activeAnts[i][0], activeAnts[i][1], canvas);
-            }
-            toggleY = randInt(0,1);
-        }
-        */
+
     }
 
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
@@ -225,12 +199,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
         }
-        //for (int i=0;i<num_ants;i++) {
-        //    if ((Math.abs(activeAnts[i][0] - x) < 30) && (Math.abs(activeAnts[i][1] - y) < 30)) {
-        //        antRelease[i][1] = -2;//ant killed, assigned -2
-        //        antRelease[i][0] = (int) time_ants + 1;
-        //    }
-        //}
 
     }
 
@@ -271,11 +239,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 successfulAnts++;
             }
         }
-        //  for (int i=0;i<num_ants;i++) {
-        //     if ((antRelease[i][0] == (int) time_ants +1) && (antRelease[i][1]!=-2)) { //ant made it to the picnic basket
-        //          successfulAnts++;
-        //     }
-        //  }
         return successfulAnts;
     }
 
@@ -294,16 +257,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 ant.time = (int) time_ants + 1; //ant wont' be released during this game.
             }
         }
-        /*for (int i=0;i<num_ants;i++) {
-            countDead += antRelease[i][1];
-            if ((antRelease[i][1]<=-1) && (antRelease[i][0] == (int) time_ants + 1)) {
-                countDoneAnts++;
-            }
-            if ((activeAnts[i][0] > (screenWidth * .85))&&(antRelease[i][1]==0)) { //ant made it to the picnic basket
-                antRelease[i][1]= -1; //ant returned to pre game status
-                antRelease[i][0]= (int) time_ants + 1; //ant wont' be released during this game.
-            }
-        }*/
         if ((countDoneAnts == num_ants) || (countDead == -2* num_ants)) return true;
         else return false;
     }
@@ -474,6 +427,14 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         // so add 1 to make it inclusive
         int randomNum = rand.nextInt((max - min) + 1) + min;
 
+        return randomNum;
+    }
+
+    public static double randDouble(int min, int max) {
+        Random rand = new Random();
+
+        double randomNum = rand.nextDouble();
+        randomNum = randInt(min,max) * randomNum;
         return randomNum;
     }
     // stop the game; may be called by the MainGameFragment onPause
