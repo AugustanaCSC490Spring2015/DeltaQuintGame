@@ -26,7 +26,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash);
 
         CheckBox hardDif = (CheckBox) findViewById(R.id.hardCheckBox);
-        Switch survivalMode = (Switch) findViewById(R.id.UISurvivalMode);
+        final Switch survivalMode = (Switch) findViewById(R.id.UISurvivalMode);
 
         difficulty = getSharedPreferences("difficulty", MODE_PRIVATE);
         gameMode = getSharedPreferences("mode", MODE_PRIVATE);
@@ -71,7 +71,7 @@ public class SplashActivity extends Activity {
         });
         survivalMode.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                toggleMode();
+                toggleMode(survivalMode);
             }
         });
     }
@@ -90,18 +90,18 @@ public class SplashActivity extends Activity {
             }
             prefEditor.apply();
     }
-       private void toggleMode() {
+       private void toggleMode(Switch survivalMode) {
            gameMode = getSharedPreferences("mode", MODE_PRIVATE);
            SharedPreferences.Editor modeEditor = gameMode.edit();
            String mode = gameMode.getString("mode","");
-           if(mode.equals("Classic")){
+           if(survivalMode.isChecked()){
                modeEditor.remove("mode");
                modeEditor.putString("mode", "Survival");
            }else{
                modeEditor.remove("mode");
                modeEditor.putString("mode", "Classic");
            }
-
+            modeEditor.apply();
 
        }
 

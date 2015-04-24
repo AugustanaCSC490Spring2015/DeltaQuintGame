@@ -66,7 +66,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private int successfulAnts;//count of ants that get to the basket
     private double x_speed; //depending on the game setting, this variable will be set to the constant ant speed
     private double y_speed; //depending on the game setting, this variable will be set to the constant ant speed
-    private int num_ants; //depedning on the game setting, this variable will be the max iterator of loops/number of ants
+    private int num_ants; //depending on the game setting, this variable will be the max iterator of loops/number of ants
     private double time_ants; //depending on the game setting, this variable will represent game time.
 
     private Paint myPaint; // paint for general drawing
@@ -81,6 +81,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     MyTimerTask myTimerTask;
     int seconds;
     int level;
+    int lives;
 
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
@@ -253,6 +254,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 countDoneAnts++;
             }
             if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
+                lives-=1;
                 ant.health = -1;//ant returned to pre game status
                 ant.time = (int) time_ants + 1; //ant wont' be released during this game.
             }
@@ -313,6 +315,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         seconds = 0;
         level = 0;
+        lives = 3;
 
         allAnts.clear();
         populateAnts();
@@ -336,17 +339,27 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         timeLeft-=interval;
 
-        if (timeLeft <= 0.0)
-        {
-            timeLeft = 0.0;
-            isGameOver = true; // the game is over
-            gameThread.setRunning(false); // terminate thread
-            showGameOverDialog(R.string.lose); // show the losing dialog
-        } else if (checkAntStatus()){
-            isGameOver = true;
-            gameThread.setRunning(false);
-            if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
-                showGameOverDialog(R.string.win); //show winning dialog
+        if(!mode){
+            if (timeLeft <= 0.0)
+            {
+                timeLeft = 0.0;
+                isGameOver = true; // the game is over
+                gameThread.setRunning(false); // terminate thread
+                showGameOverDialog(R.string.lose); // show the losing dialog
+            } else if (checkAntStatus()){
+                isGameOver = true;
+                gameThread.setRunning(false);
+                if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
+                    showGameOverDialog(R.string.win); //show winning dialog
+            }
+        }
+        else{
+            checkAntStatus();
+            if(lives <= 0){
+                isGameOver = true;
+                gameThread.setRunning(false);
+                showGameOverDialog(R.string.app_name);
+            }
         }
     }
 
@@ -407,11 +420,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawRect(0,0,screenWidth, 55, topBar);
 
         if(mode){
-
+            canvas.drawText("Score: " + score, 25, 45, textPaint);
+            canvas.drawText("Lives: " + lives, screenWidth - 200, 45, textPaint);
         }
         else{
-            canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 50, textPaint);
-            canvas.drawText(score + "", 100, screenWidth - 150, textPaint);
+            canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 35, textPaint);
             canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
         }
     }
