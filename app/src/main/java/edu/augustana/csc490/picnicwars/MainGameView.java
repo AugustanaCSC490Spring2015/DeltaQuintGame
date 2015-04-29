@@ -82,6 +82,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     int seconds;
     int level;
     int lives;
+    boolean addMoreAnts;
 
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
@@ -129,19 +130,37 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //populate the ants with random y position and random start times.
     public void populateAnts() {
-        for(int i = 0; i < num_ants; i++)
-        {
-            int randomFireAnt = randInt(0,100);
-          //  int timer = (randInt(3, (int) (time_ants  - 10));
-           double timer = randDouble(3,(int) (time_ants - 5));
-
-            if(i == 0){
-                timer = 1.0;
-            }
-            allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
-            if(randomFireAnt >= 95)
+        int randomFireAnt;
+        double timer;
+        if(!mode){
+            for(int i = 0; i < num_ants; i++)
             {
-                allAnts.add(new Ants((int) (screenWidth * .01), randInt((int) (screenHeight *.3), (int) (screenHeight*.7)), 1, -1, timer));
+                randomFireAnt = randInt(0,100);
+                //  int timer = (randInt(3, (int) (time_ants  - 10));
+                timer = randDouble(3,(int) (time_ants - 5));
+
+                if(i == 0){
+                    timer = 1.0;
+                }
+                allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
+                if(randomFireAnt >= 95)
+                {
+                    allAnts.add(new Ants((int) (screenWidth * .01), randInt((int) (screenHeight *.3), (int) (screenHeight*.7)), 1, -1, timer));
+                }
+            }
+        }
+        else{
+            for(int i = 0; i < 10; i++){
+                randomFireAnt = randInt(0,100);
+                timer = randDouble(0,10);
+
+                if(randomFireAnt >= 95){
+                    allAnts.add(new Ants((int) (screenWidth * .01), randInt((int) (screenHeight *.3), (int) (screenHeight*.7)), 1, -1, timer));
+                }
+                else{
+                    allAnts.add(new Ants((int) (screenWidth * .01),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
+                }
+
             }
         }
     }
@@ -149,6 +168,21 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //if ants are on the screen, update them to move at variable speeds
     private void updateAnts(double interval, Canvas canvas) {
         int toggleY = randInt(0,1);
+
+        if(mode && addMoreAnts){
+            for(int i = 0; i <= level; i++){
+                int randomFireAnt = randInt(0, 100);
+                double timer = randDouble(seconds,seconds + 10);
+
+                if(randomFireAnt >= 95){
+                    allAnts.add(new Ants(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight *.3), (int) (screenHeight*.7)), 1, -1, timer));
+                }
+                else{
+                    allAnts.add(new Ants(randInt(-1000, (int) (screenWidth * .01)),randInt((int) (screenHeight*.3),(int) (screenHeight*.7)), 0, -1, timer));
+                }
+                addMoreAnts = false;
+            }
+        }
 
         for(Ants ant:allAnts)
         {
@@ -187,19 +221,27 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
         //for each ant in the list of ants, check to see if an ant is touched. If an ant is touched, it's health is reset.
+       // List<Ants> antsToRemove = new ArrayList<Ants>();
+
         for(Ants ant: allAnts)
         {
             if((Math.abs(ant.xCoordinate - x) < 30) && (Math.abs(ant.yCoordinate - y) < 30)){
             ant.health = -2;//ant killed, assigned -2
-            ant.time = (int) time_ants + 1;//set Ants time to 'respawn' to after game so they never appear again
+            ant.time = Integer.MAX_VALUE;//set Ants time to 'respawn' to after game so they never appear again
+            ant.xCoordinate = Integer.MIN_VALUE;//sets ants xCoordinate to be off the screen so you don't get points when clicking where they died.
             if(ant.antColor == 0){
                 score+=10;
             }
             else{
                 score+=20;
             }
+                //antsToRemove.add(ant);
+            }
         }
-        }
+
+       // for(Ants ant: antsToRemove) {
+            //allAnts.remove(ant);
+        //}
 
     }
 
@@ -244,7 +286,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     //check to see if all ants are dead. Return true if all ants are dead.
-    private boolean checkAntStatus() {
+    private boolean checkAntStatusClassic() {
         int countDead = 0;
         int countDoneAnts = 0;
         for(Ants ant: allAnts)
@@ -254,12 +296,24 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 countDoneAnts++;
             }
             if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
-                lives-=1;
                 ant.health = -1;//ant returned to pre game status
                 ant.time = (int) time_ants + 1; //ant wont' be released during this game.
             }
         }
         if ((countDoneAnts == num_ants) || (countDead == -2* num_ants)) return true;
+        else return false;
+    }
+
+    private boolean checkAntStatusSurvival() {
+        for(Ants ant: allAnts)
+        {
+            if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
+                lives-=1;
+                ant.health = -1;//ant returned to pre game status
+                ant.time = (int) time_ants + 1; //ant wont' be released during this game.
+            }
+        }
+        if (lives <= 0) return true;
         else return false;
     }
 
@@ -316,6 +370,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         seconds = 0;
         level = 0;
         lives = 3;
+        addMoreAnts = true;
 
         allAnts.clear();
         populateAnts();
@@ -346,7 +401,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 isGameOver = true; // the game is over
                 gameThread.setRunning(false); // terminate thread
                 showGameOverDialog(R.string.lose); // show the losing dialog
-            } else if (checkAntStatus()){
+            } else if (checkAntStatusClassic()){
                 isGameOver = true;
                 gameThread.setRunning(false);
                 if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
@@ -354,11 +409,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
         else{
-            checkAntStatus();
-            if(lives <= 0){
-                isGameOver = true;
-                gameThread.setRunning(false);
-                showGameOverDialog(R.string.app_name);
+            if(checkAntStatusSurvival()){
+                timeLeft = 0.0;
+                isGameOver = true; // the game is over
+                gameThread.setRunning(false); // terminate thread
+                showGameOverDialog(R.string.lose); // show the losing dialog
             }
         }
     }
@@ -576,6 +631,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         public void run() {
             seconds += 1;
             level = seconds / 10;
+            addMoreAnts = true;
             if(level < 1){
                 level = 1;
             }
