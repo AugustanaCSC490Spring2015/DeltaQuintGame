@@ -84,6 +84,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     int lives;
     boolean addMoreAnts;
 
+    int highScore1;
+    int highScore2;
+    int highScore3;
+
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
@@ -92,6 +96,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     private SharedPreferences difficulty; //to access the sharedPreferences which represents chosen difficulty
     private SharedPreferences gameMode; // To access which game Mode to implement
+    private SharedPreferences highScoreOne; // To access the high scores
+    private SharedPreferences highScoreTwo; // To access the high scores
+    private SharedPreferences highScoreThree; // To access the high scores
+
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -101,6 +109,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         difficulty = getContext().getSharedPreferences("difficulty",Context.MODE_PRIVATE);
         gameMode = getContext().getSharedPreferences("mode", Context.MODE_PRIVATE);
+        highScoreOne = getContext().getSharedPreferences("highScoreOne", Context.MODE_PRIVATE);
+        highScoreTwo = getContext().getSharedPreferences("highScoreTwo", Context.MODE_PRIVATE);
+        highScoreThree = getContext().getSharedPreferences("highScoreThree", Context.MODE_PRIVATE);
+
+
 
         drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
 
@@ -307,10 +320,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private boolean checkAntStatusSurvival() {
         for(Ants ant: allAnts)
         {
-            if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
+            if((ant.xCoordinate > (screenWidth)) && (ant.health == 0)){//ant made it to the picnic basket
                 lives-=1;
                 ant.health = -1;//ant returned to pre game status
-                ant.time = (int) time_ants + 1; //ant wont' be released during this game.
+                ant.time = Integer.MAX_VALUE; //ant wont' be released during this game.
             }
         }
         if (lives <= 0) return true;
@@ -337,6 +350,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     public void startNewGame() {
         String difString = difficulty.getString("difficulty","");
         String modeString = gameMode.getString("mode","");
+
+        highScore1 = highScoreOne.getInt("highScoreOne", 0);
+        highScore2 = highScoreTwo.getInt("highScoreTwo", 0);
+        highScore3 = highScoreThree.getInt("highScoreThree", 0);
+
 
         if(modeString.equals("Classic")){
             mode = false;
@@ -400,26 +418,51 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 timeLeft = 0.0;
                 isGameOver = true; // the game is over
                 gameThread.setRunning(false); // terminate thread
-                showGameOverDialog(R.string.lose); // show the losing dialog
+                showGameOverDialog(R.string.lose, R.string.gameOver); // show the losing dialog
             } else if (checkAntStatusClassic()){
                 isGameOver = true;
                 gameThread.setRunning(false);
-                if (countSuccess() > 0) showGameOverDialog(R.string.lose); else
-                    showGameOverDialog(R.string.win); //show winning dialog
+                if (countSuccess() > 0) showGameOverDialog(R.string.lose, R.string.gameOver); else
+                    showGameOverDialog(R.string.win, R.string.gameOver); //show winning dialog
             }
         }
         else{
             if(checkAntStatusSurvival()){
+                insertTime(canvas);
                 timeLeft = 0.0;
                 isGameOver = true; // the game is over
                 gameThread.setRunning(false); // terminate thread
-                showGameOverDialog(R.string.lose); // show the losing dialog
+                SharedPreferences.Editor highScoreEditor;
+                if(score > highScore1){
+                    highScoreEditor = highScoreOne.edit();
+                    highScoreEditor.putInt("highScoreOne", score);
+                    highScoreEditor.putInt("highScoreTwo", highScore1);
+                    highScoreEditor.putInt("highScoreThree", highScore2);
+                    highScoreEditor.apply();
+                    showGameOverDialog(R.string.highScoreTitle, R.string.highScore); // show the losing dialog
+                }
+                else if(score > highScore2){
+                    highScoreEditor = highScoreTwo.edit();
+                    highScoreEditor.putInt("highScoreTwo", score);
+                    highScoreEditor.putInt("highScoreThree", highScore2);
+                    highScoreEditor.apply();
+                    showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
+                }
+                else if(score > highScore3){
+                    highScoreEditor = highScoreThree.edit();
+                    highScoreEditor.putInt("highScoreThree", score);
+                    highScoreEditor.apply();
+                    showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
+                }
+                else{
+                    showGameOverDialog(R.string.gameOver, R.string.endSurvival); // show the losing dialog
+                }
             }
         }
     }
 
     // display an AlertDialog when the game ends
-    private void showGameOverDialog(final int messageId) {
+    private void showGameOverDialog(final int messageId, final int message) {
 
         final DialogFragment gameResult =
                 new DialogFragment() {
@@ -429,7 +472,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         // create dialog displaying String resource for messageId
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(getResources().getString(messageId));
-                        builder.setMessage(getResources().getString(R.string.results, successfulAnts));
+                        if(!mode){
+                            builder.setMessage(getResources().getString(message, successfulAnts));
+                        }
+                        else{
+                            builder.setMessage(getResources().getString(message, score, highScore1));
+                        }
                         builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
