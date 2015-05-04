@@ -90,6 +90,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
+    private Bitmap antLifeDrawing; // http://www.moxiedot.com/wp-content/uploads/2013/07/ant.jpg
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
     boolean dif; //boolean to represent difficulty: true is hard, false is easy
     boolean mode; //boolean to represent game modes; true is survival, false is classic
@@ -116,6 +117,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
         drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
+        antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
 
         getHolder().addCallback(this);
 
@@ -291,7 +293,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         successfulAnts = 0;
         for(Ants ant: allAnts)
         {
-            if((ant.health != -2)){
+            if((ant.health == 3)){
                 successfulAnts++;
             }
         }
@@ -308,12 +310,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             if((ant.health <= -1) && (ant.time == (int) time_ants + 1)){
                 countDoneAnts++;
             }
-            if((ant.time > (screenWidth * .85)) && (ant.health == 0)){//ant made it to the picnic basket
-                ant.health = -1;//ant returned to pre game status
-                ant.time = (int) time_ants + 1; //ant wont' be released during this game.
+            if((ant.xCoordinate > (screenWidth)) && (ant.health == 0)){//ant made it to the picnic basket
+                ant.health = 3;//ant returned to pre game status
+                ant.time = Integer.MAX_VALUE; //ant wont' be released during this game.
             }
         }
-        if ((countDoneAnts == num_ants) || (countDead == -2* num_ants)) return true;
+        if ((countDoneAnts == allAnts.size()) || (countDead == -2* allAnts.size())) return true;
         else return false;
     }
 
@@ -523,12 +525,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawRect(0,0,screenWidth, 55, topBar);
 
         if(mode){
+            antLifeDrawing = antLifeDrawing.createScaledBitmap(antLifeDrawing,50,50,true);
+            for(int i = 1; i <= lives; i++){
+
+                canvas.drawBitmap(antLifeDrawing, screenWidth - (25 * i), 45, null);
+
+            }
             canvas.drawText("Score: " + score, 25, 45, textPaint);
             canvas.drawText("Lives: " + lives, screenWidth - 200, 45, textPaint);
         }
         else{
-            canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 35, textPaint);
-            canvas.drawText(getResources().getString(R.string.results,countSuccess()),30,(float) screenWidth/2, textPaint);
+            canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 45, textPaint);
+            canvas.drawText(getResources().getString(R.string.results,countSuccess()),25, screenHeight - 45, textPaint);
         }
     }
 

@@ -33,7 +33,7 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Play game in Hard Mode?"
+            android:text="Hard Mode?"
             android:id="@+id/hardCheckBox"
             android:layout_row="7"
             android:layout_column="0"
@@ -43,18 +43,26 @@
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Survival"
             android:id="@+id/UISurvivalMode"
             android:layout_row="7"
             android:layout_column="1"
             android:layout_gravity="center"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
-            android:checked="false" />
+            android:checked="false"
+            android:textOff="Classic"
+            android:textOn="Survival" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/imageButton"
+            android:src="@mipmap/high_score"
+            android:background="#ffffffff" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/start_game_button"
             android:id="@+id/buttonStartGame"
@@ -62,8 +70,8 @@
             android:layout_row="7"
             android:onClick="mainGameView"
             android:gravity="center_vertical|center_horizontal"
-            android:enabled="true"
-            android:layout_gravity="right" />
+            android:enabled="true" />
+
     </LinearLayout>
 
     <!--
