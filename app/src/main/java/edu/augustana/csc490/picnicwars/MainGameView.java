@@ -124,7 +124,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
 
-        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
+        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnicgrass);
         antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
         beetleDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.beetle);
         butterflyDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.butterfly);
