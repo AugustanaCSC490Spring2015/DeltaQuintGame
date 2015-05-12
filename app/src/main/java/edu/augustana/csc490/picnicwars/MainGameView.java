@@ -86,6 +86,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     int level;
     int lives;
     boolean addMoreBugs;
+    boolean earthquakePowerUp;
 
     int highScore1;
     int highScore2;
@@ -98,6 +99,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
     private Bitmap butterflyDrawing;
     //SOURCE FOR BUTTERFLY?
+    private Bitmap earthquakeDrawing;
+    //source: http://www.beready.iowa.gov/Images/icons/earthquake_100px.png
 
 
 
@@ -124,10 +127,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
 
-        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnicgrass);
+        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnic_background);
         antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
         beetleDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.beetle);
         butterflyDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.butterfly);
+        earthquakeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.earthquake_100px);
 
         getHolder().addCallback(this);
 
@@ -167,10 +171,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 if(i == 0){
                     timer = 1.0;
                 }
-                allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, -1, timer, 1));
+                allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, 1, timer, 1, x_speed));
                 if(randomFireAnt >= 95)
                 {
-                    allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, -1, timer, 1));
+                    allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer, 1, x_speed * 1.4));
                 }
             }
         }
@@ -180,10 +184,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 timer = randDouble(0,10);
 
                 if(randomFireAnt >= 95){
-                    allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, -1, timer,1));
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,1, x_speed * 1.4));
                 }
                 else{
-                    allBugs.add(new Bug((int) (screenWidth * .01), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, -1, timer,1));
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, 1, timer,1, x_speed));
                 }
 
             }
@@ -200,16 +204,16 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 double timer = randDouble(seconds,seconds + 10);
 
                 if(randomFireAnt >= 95){
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,1)); //add red ant to List of bugs
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,1, x_speed * 1.4)); //add red ant to List of bugs
                 }
                 else if(randomFireAnt >= 90){
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,2)); //add butterfly to List of bugs
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,2, X_BUTTERFLY_SPEED_EASY)); //add butterfly to List of bugs
                 }
                 else if(randomFireAnt >= 85){
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 3, timer,3)); //add beetle to List of bugs
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 3, timer,3, X_BEETLE_SPEED_EASY)); //add beetle to List of bugs
                 }
                 else{
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, 1, timer,1));//add black ant (most common)
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, 1, timer,1, x_speed));//add black ant (most common)
                 }
                 addMoreBugs = false;
             }
@@ -217,30 +221,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         for(Bug bug: allBugs)
         {
-            if(bug.health > 0)
+            if((bug.health > 0 && mode) || (!mode && bug.health > 0 && (bug.time <= time_ants - timeLeft)))
             {
-                if(bug.bugType == 1){
-                    if(bug.antColor == 0 || bug.bugType == 2 || bug.bugType == 3){
-                        bug.xCoordinate += interval * x_speed;
-                    }
-                    else{
-                        bug.xCoordinate += interval * x_speed * 1.4;
-                    }
-                }
-                else if(bug.bugType == 2){
-                    bug.xCoordinate += interval *  X_BUTTERFLY_SPEED_EASY;
-                }
-                else{
-                    bug.xCoordinate += interval * X_BEETLE_SPEED_EASY;
-                }
-
+                bug.xCoordinate += interval * bug.speed;
+                int randomYMovement = randInt(-2,2);
+                bug.yCoordinate += randomYMovement;
                 if(toggleY == 1 && bug.xCoordinate < (screenHeight * .8))
                 {
                     bug.yCoordinate += interval * y_speed;
                 }
                 else if(toggleY != 1 && (bug.yCoordinate > (screenHeight * .2)))
                 {
-                    bug.yCoordinate += -1 * interval * y_speed;
+                    bug.yCoordinate -= -1 * interval * y_speed;
                 }
                 if(bug.antColor == 0){
                     drawBug(bug.xCoordinate, bug.yCoordinate, canvas, blackAntPaint, bug.bugType);
@@ -254,10 +246,22 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
+    private void earthQuake(){
+
+        for(Bug bug:allBugs){
+            bug.health = - 1;
+        }
+        seconds = 0;
+        level = 0;
+    }
     //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
     private void checkTouch(int x, int y){
         //for each ant in the list of ants, check to see if an ant is touched. If an ant is touched, it's health is reset.
        // List<Bug> antsToRemove = new ArrayList<Bug>();
+        if(mode && earthquakePowerUp && (x >= 25 && x <= 75) && (y >= screenHeight-75 && y <= screenHeight - 25)){
+            earthQuake();
+            earthquakePowerUp = false;
+        }
 
         for(Bug bug: allBugs)
         {
@@ -354,20 +358,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     //check to see if all ants are dead. Return true if all ants are dead.
     private boolean checkAntStatusClassic() {
-        int countDead = 0;
         int countDoneAnts = 0;
         for(Bug ant: allBugs)
         {
-            countDead += ant.health;
-            if((ant.health <= 0) && (ant.time == (int) time_ants + 1)){
+            if(ant.health <= 0){
                 countDoneAnts++;
             }
-            if((ant.xCoordinate > (screenWidth)) && (ant.health == 0)){//ant made it to the picnic basket
-                ant.health = -1;//ant returned to pre game status
+            if((ant.xCoordinate > (screenWidth)) && (ant.health > 0)){//ant made it to the picnic basket
+                ant.health = -2;//ant returned to pre game status
                 ant.time = Integer.MAX_VALUE; //ant wont' be released during this game.
             }
         }
-        if ((countDoneAnts == allBugs.size()) || (countDead == -2* allBugs.size())) return true;
+        if ((countDoneAnts == allBugs.size())) return true;
         else return false;
     }
 
@@ -398,7 +400,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         drawing = drawing.createScaledBitmap(drawing,w,h,true);
         beetleDrawing = beetleDrawing.createScaledBitmap(beetleDrawing,150,150,true);
         butterflyDrawing = butterflyDrawing.createScaledBitmap(butterflyDrawing,150,150,true);
-
 
         startNewGame();
         textPaint.setTextSize(w / 25); // text size 1/25 of screen width
@@ -448,6 +449,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         level = 0;
         lives = 3;
         addMoreBugs = true;
+        earthquakePowerUp = true;
 
         allBugs.clear();
         populateAnts();
@@ -590,6 +592,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }*/ //Code for drawing ants instead of using numbers to represent lives
             canvas.drawText("Score: " + score, 25, 45, textPaint);
             canvas.drawText("Lives: " + lives, screenWidth - 200, 45, textPaint);
+            if(earthquakePowerUp){
+                earthquakeDrawing = earthquakeDrawing.createScaledBitmap(earthquakeDrawing,50,50,true);
+                canvas.drawBitmap(earthquakeDrawing, 25, screenHeight - 75, null);
+            }
         }
         else{
             canvas.drawText(getResources().getString(R.string.time_left, timeLeft), 25, 45, textPaint);
