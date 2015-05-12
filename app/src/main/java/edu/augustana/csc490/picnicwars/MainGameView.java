@@ -276,7 +276,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 }
             }
             else if(bug.bugType == 2){
-
+                if((x > bug.xCoordinate + 25 && x < bug.xCoordinate + 115) && (y > bug.yCoordinate + 30 && y < bug.yCoordinate + 120)){
+                    bug.health -=1;//ant killed, assigned -2
+                    bug.time = Integer.MAX_VALUE;//set Bug time to 'respawn' to after game so they never appear again
+                    bug.xCoordinate = Integer.MIN_VALUE;//sets ants xCoordinate to be off the screen so you don't get points when clicking where they died.
+                    lives-=1;
+                }
             }
             else{
                 if((x > bug.xCoordinate + 20 && x < bug.xCoordinate + 130) && (y > bug.yCoordinate + 40 && y < bug.yCoordinate + 100)){
@@ -327,7 +332,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         }
        else if(bugType == 2){
             canvas.drawBitmap(butterflyDrawing,x,y,null);
-            //canvas.drawCircle(x,y,25,antColor);
+            //canvas.drawCircle(x+70,y+75,45,antColor);
         }
         else{
             canvas.drawBitmap(beetleDrawing, x, y, null);
