@@ -23,7 +23,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:layout_row="7"
         android:background="#FFFFFF"
         android:layout_gravity="fill_horizontal"
@@ -38,7 +38,8 @@
             android:layout_row="7"
             android:layout_column="0"
             android:gravity="center_vertical|left"
-            android:layout_gravity="center_vertical|left" />
+            android:layout_gravity="center_vertical|left"
+            android:layout_weight="1" />
 
         <Switch
             android:layout_width="wrap_content"
@@ -51,18 +52,20 @@
             android:paddingRight="30dp"
             android:checked="false"
             android:textOff="Classic"
-            android:textOn="Survival" />
+            android:textOn="Survival"
+            android:layout_weight="1" />
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/imageButton"
+            android:layout_height="wrap_content"
+            android:id="@+id/highScoreButton"
             android:src="@mipmap/high_score"
-            android:background="#ffffffff" />
+            android:background="#ffffffff"
+            android:layout_weight="1.19" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/start_game_button"
             android:id="@+id/buttonStartGame"
@@ -70,7 +73,8 @@
             android:layout_row="7"
             android:onClick="mainGameView"
             android:gravity="center_vertical|center_horizontal"
-            android:enabled="true" />
+            android:enabled="true"
+            android:layout_weight="2" />
 
     </LinearLayout>
 

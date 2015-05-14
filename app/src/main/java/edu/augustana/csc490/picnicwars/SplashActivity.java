@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.Switch;
 
 /**
@@ -56,10 +57,17 @@ public class SplashActivity extends Activity {
         }
 
         Button next = (Button) findViewById(R.id.buttonStartGame);
+        ImageButton highScores = (ImageButton) findViewById(R.id.highScoreButton);
 
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Intent myIntent = new Intent(view.getContext(), MainActivity.class);
+                startActivityForResult(myIntent, 0);
+            }
+        });
+        highScores.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent myIntent = new Intent(view.getContext(), HighScores.class);
                 startActivityForResult(myIntent, 0);
             }
         });

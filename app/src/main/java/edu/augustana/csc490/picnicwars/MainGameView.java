@@ -15,11 +15,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,9 +90,18 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     boolean addMoreBugs;
     boolean earthquakePowerUp;
 
-    int highScore1;
-    int highScore2;
-    int highScore3;
+    String highScore1;
+    String highScore2;
+    String highScore3;
+    String highScore4;
+    String highScore5;
+
+    int highScore1Number;
+    int highScore2Number;
+    int highScore3Number;
+    int highScore4Number;
+    int highScore5Number;
+
 
 
     private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
@@ -113,6 +124,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private SharedPreferences highScoreOne; // To access the high scores
     private SharedPreferences highScoreTwo; // To access the high scores
     private SharedPreferences highScoreThree; // To access the high scores
+    private SharedPreferences highScoreFour; // To access the high scores
+    private SharedPreferences highScoreFive; // To access the high scores
+    private String userName = "Null";
+    boolean saveHighScore = false;
+
+
 
     public MainGameView(Context context, AttributeSet atts)
     {
@@ -124,6 +141,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         highScoreOne = getContext().getSharedPreferences("highScoreOne", Context.MODE_PRIVATE);
         highScoreTwo = getContext().getSharedPreferences("highScoreTwo", Context.MODE_PRIVATE);
         highScoreThree = getContext().getSharedPreferences("highScoreThree", Context.MODE_PRIVATE);
+        highScoreFour = getContext().getSharedPreferences("highScoreFour", Context.MODE_PRIVATE);
+        highScoreFive = getContext().getSharedPreferences("highScoreFive", Context.MODE_PRIVATE);
+
 
 
 
@@ -411,9 +431,25 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         String difString = difficulty.getString("difficulty","");
         String modeString = gameMode.getString("mode","");
 
-        highScore1 = highScoreOne.getInt("highScoreOne", 0);
-        highScore2 = highScoreTwo.getInt("highScoreTwo", 0);
-        highScore3 = highScoreThree.getInt("highScoreThree", 0);
+        highScore1 = highScoreOne.getString("highScoreOne", "0 Null");
+        highScore2 = highScoreTwo.getString("highScoreTwo", "0 Null");
+        highScore3 = highScoreThree.getString("highScoreThree", "0 Null");
+        highScore4 = highScoreFour.getString("highScoreFour", "0 Null");
+        highScore5 = highScoreFive.getString("highScoreFive", "0 Null");
+
+        String highScore1Substring = highScore1.substring(0, highScore1.indexOf(" "));
+        String highScore2Substring = highScore2.substring(0, highScore2.indexOf(" "));
+        String highScore3Substring = highScore3.substring(0, highScore3.indexOf(" "));
+        String highScore4Substring = highScore4.substring(0, highScore4.indexOf(" "));
+        String highScore5Substring = highScore5.substring(0, highScore5.indexOf(" "));
+
+        highScore1Number = Integer.parseInt(highScore1Substring);
+        highScore2Number = Integer.parseInt(highScore2Substring);
+        highScore3Number = Integer.parseInt(highScore3Substring);
+        highScore4Number = Integer.parseInt(highScore4Substring);
+        highScore5Number = Integer.parseInt(highScore5Substring);
+
+
 
 
         if(modeString.equals("Classic")){
@@ -494,25 +530,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 isGameOver = true; // the game is over
                 gameThread.setRunning(false); // terminate thread
                 SharedPreferences.Editor highScoreEditor;
-                if(score > highScore1){
-                    highScoreEditor = highScoreOne.edit();
-                    highScoreEditor.putInt("highScoreOne", score);
-                    highScoreEditor.putInt("highScoreTwo", highScore1);
-                    highScoreEditor.putInt("highScoreThree", highScore2);
-                    highScoreEditor.apply();
+                if(score > highScore1Number){
                     showGameOverDialog(R.string.highScoreTitle, R.string.highScore); // show the losing dialog
                 }
-                else if(score > highScore2){
-                    highScoreEditor = highScoreTwo.edit();
-                    highScoreEditor.putInt("highScoreTwo", score);
-                    highScoreEditor.putInt("highScoreThree", highScore2);
-                    highScoreEditor.apply();
-                    showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
-                }
-                else if(score > highScore3){
-                    highScoreEditor = highScoreThree.edit();
-                    highScoreEditor.putInt("highScoreThree", score);
-                    highScoreEditor.apply();
+                else if(score > highScore5Number){
                     showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
                 }
                 else{
@@ -524,7 +545,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     // display an AlertDialog when the game ends
     private void showGameOverDialog(final int messageId, final int message) {
-
         final DialogFragment gameResult =
                 new DialogFragment() {
                     // create an AlertDialog and return it
@@ -533,17 +553,28 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         // create dialog displaying String resource for messageId
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(getResources().getString(messageId));
+                        final EditText input = new EditText(getContext());
+                        if(messageId == R.string.highScoreTitle){
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            builder.setView(input);
+                            saveHighScore = true;
+                        }
+
                         if(!mode){
                             builder.setMessage(getResources().getString(message, successfulAnts));
                         }
                         else{
-                            builder.setMessage(getResources().getString(message, score, highScore1));
+                            builder.setMessage(getResources().getString(message, score, highScore1Number));
                         }
                         builder.setPositiveButton(R.string.reset_button_string,
                                 new DialogInterface.OnClickListener() {
                                     // called when "Reset Game" Button is pressed
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        if(saveHighScore){
+                                            userName = input.getText().toString();
+                                            saveHighScore(userName);
+                                        }
                                         dialogIsDisplayed = false;
                                         startNewGame(); // set up and start a new game
                                     }
@@ -554,6 +585,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        if(saveHighScore){
+                                            userName = input.getText().toString();
+                                            saveHighScore(userName);
+                                        }
                                         dialogIsDisplayed = false;
                                         stopGame();
                                         Intent myIntent = new Intent(getContext(), SplashActivity.class);
@@ -575,6 +610,71 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 } // end Runnable
         ); // end call to runOnUiThread
     } // end method showGameOverDialog
+
+    //method that will update shared preferences for high scores that have been changed.
+    public void saveHighScore(String name){
+        SharedPreferences.Editor highScoreEditor;
+        if(score > highScore1Number){
+            highScoreEditor = highScoreOne.edit();
+            highScoreEditor.putString("highScoreOne", score + " " + name);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreTwo.edit();
+            highScoreEditor.putString("highScoreTwo", highScore1);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreThree.edit();
+            highScoreEditor.putString("highScoreThree", highScore2);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFour.edit();
+            highScoreEditor.putString("highScoreFour", highScore3);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFive.edit();
+            highScoreEditor.putString("highScoreFive", highScore4);
+            highScoreEditor.apply();
+        }
+        else if(score > highScore2Number){
+            highScoreEditor = highScoreTwo.edit();
+            highScoreEditor.putString("highScoreTwo", score + " " + name);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreThree.edit();
+            highScoreEditor.putString("highScoreThree", highScore2);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFour.edit();
+            highScoreEditor.putString("highScoreFour", highScore3);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFive.edit();
+            highScoreEditor.putString("highScoreFive", highScore4);
+            highScoreEditor.apply();
+
+        }
+        else if(score > highScore3Number){
+            highScoreEditor = highScoreThree.edit();
+            highScoreEditor.putString("highScoreThree", score + " " + name);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFour.edit();
+            highScoreEditor.putString("highScoreFour", highScore3);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFive.edit();
+            highScoreEditor.putString("highScoreFive", highScore4);
+            highScoreEditor.apply();
+            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
+        }
+        else if(score > highScore4Number){
+            highScoreEditor = highScoreFour.edit();
+            highScoreEditor.putString("highScoreFour", score + " " + name);
+            highScoreEditor.apply();
+            highScoreEditor = highScoreFive.edit();
+            highScoreEditor.putString("highScoreFive", highScore4);
+            highScoreEditor.apply();
+            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
+        }
+        else if(score > highScore5Number){
+            highScoreEditor = highScoreFive.edit();
+            highScoreEditor.putString("highScoreFive", score + " " + name);
+            highScoreEditor.apply();
+            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
+        }
+    }
+
 
     //add the time remaining and number of ants in basket to screen
     public void insertTime(Canvas canvas) {

@@ -9,8 +9,8 @@
     <string name="lose"> You Lose! </string>
     <string name="gameOver">Game Over!</string>
     <string name="highScoreTitle">You scored a High Score!</string>
-    <string name="highScore">New High Score! You fought admirably against the hoard of ants.\n\nScore: %1$d</string>
-    <string name="closeHighScore">You killed a lot of ants. But not enough to renounce the claim to the World\'s Best Ant Killer. \n\nScore: %1$d \nHigh Score: %2$d</string>
+    <string name="highScore">New High Score! You fought admirably against the hoard of ants.\n\nScore: %1$d\n\nEnter your name to be glorified on our Leader Board!</string>
+    <string name="closeHighScore">You killed a lot of ants. But not enough to renounce the claim to the World\'s Best Ant Killer. \n\nScore: %1$d \nHigh Score: %2$d\n\nEnter your name to be glorified on our Leader Board!</string>
     <string name="endSurvival">Good Try! You scored %1$d points.</string>
     <string name="difficulty_switch"> Choose a Difficulty: </string>
     <string name="start_game_button"> New Game! </string>
