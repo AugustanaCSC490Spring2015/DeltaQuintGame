@@ -104,13 +104,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
 
 
-    private Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
-    private Bitmap antLifeDrawing; // http://www.moxiedot.com/wp-content/uploads/2013/07/ant.jpg
-    private Bitmap beetleDrawing;
+    private static Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
+    private static Bitmap antLifeDrawing; // http://www.moxiedot.com/wp-content/uploads/2013/07/ant.jpg
+    private static Bitmap beetleDrawing;
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
-    private Bitmap butterflyDrawing;
+    private static Bitmap butterflyDrawing;
     //SOURCE FOR BUTTERFLY?
-    private Bitmap earthquakeDrawing;
+    private static Bitmap earthquakeDrawing;
     //source: http://www.beready.iowa.gov/Images/icons/earthquake_100px.png
 
 
@@ -145,13 +145,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         highScoreFive = getContext().getSharedPreferences("highScoreFive", Context.MODE_PRIVATE);
 
 
+        // only load the images the first time, if they haven't been loaded already
 
-
-        drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnic_background);
-        antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
-        beetleDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.beetle);
-        butterflyDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.butterfly);
-        earthquakeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.earthquake_100px);
+            drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnicgrass);
+            antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
+            beetleDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.beetle);
+            butterflyDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.butterfly);
+            earthquakeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.earthquake_100px);
 
         getHolder().addCallback(this);
 
