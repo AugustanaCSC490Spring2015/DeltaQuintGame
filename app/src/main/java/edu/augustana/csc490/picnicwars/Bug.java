@@ -9,12 +9,12 @@ import android.graphics.Paint;
  */
 public class Bug {
 
-    public int antColor;
-    public int xCoordinate;
-    public int yCoordinate;
-    public int health;
-    public double time;
-    public double speed;
+    public int antColor; //Determines the ants color
+    public int xCoordinate; //Keeps track of the bug's x coordinate
+    public int yCoordinate;//Keeps track of the bug's y coordinate
+    public int health; //Keeps track of the bugs health. 1 is the standard for the bugs, 3 is for beetles.
+    public double time; //Determines when to release the bug
+    public double speed; // Bug's speed
     public int bugType; //1 for ant; 2 for butterfly; 3 for beetle
 
     public Bug(int x, int y, int color, int health, double time, int bugType, double speed)

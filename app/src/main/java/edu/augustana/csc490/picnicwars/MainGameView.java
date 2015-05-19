@@ -22,8 +22,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -81,35 +84,35 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private Paint fireAntPaint; //paint for fire ants
 
     //Survival Characteristics
-    int score;
-    Timer timer;
-    MyTimerTask myTimerTask;
-    int seconds;
-    int level;
-    int lives;
-    boolean addMoreBugs;
-    boolean earthquakePowerUp;
+    int score; //Keeps track of score for survival mode
+    Timer timer; //Timer that increases as opposed to the decreasing timer used in the Classic mode. Used for Survival Mode
+    MyTimerTask myTimerTask; //Task to increment timer every second
+    int seconds; //Integer representing seconds passed
+    int level; //Variable that helps determine how many ants to release every second
+    int lives; //Set to 3, used to determine when to end Survival Mode
+    boolean addMoreBugs;//Boolean used to determine when to add bugs to the arraylist
+    boolean earthquakePowerUp;//Boolean that is used to determine whether the Earthquake has been used yet.
 
-    String highScore1;
-    String highScore2;
-    String highScore3;
-    String highScore4;
-    String highScore5;
+    String highScore1; //String containing the high score number and name
+    String highScore2;//String containing the 2nd high score number and name
+    String highScore3;//String containing the 3rd high score number and name
+    String highScore4;//String containing the 4th high score number and name
+    String highScore5;//String containing the 5th high score number and name
 
-    int highScore1Number;
-    int highScore2Number;
-    int highScore3Number;
-    int highScore4Number;
-    int highScore5Number;
+    int highScore1Number; //Integer used to compare whether a highscore has been scored or not.
+    int highScore2Number; //Integer used to compare whether a highscore has been scored or not.
+    int highScore3Number; //Integer used to compare whether a highscore has been scored or not.
+    int highScore4Number; //Integer used to compare whether a highscore has been scored or not.
+    int highScore5Number; //Integer used to compare whether a highscore has been scored or not.
 
 
 
-    private static Bitmap drawing; //will be the background drawing Source: http://www.canstockphoto.com/illustration/grass.html
-    private static Bitmap antLifeDrawing; // http://www.moxiedot.com/wp-content/uploads/2013/07/ant.jpg
-    private static Bitmap beetleDrawing;
+    private static Bitmap drawing; //old background drawing Source: http://www.canstockphoto.com/illustration/grass.html
+    //new Image created by Michael Madden within photoshop, images used: http://cliparts.co/cliparts/6cy/XjB/6cyXjBeEi.jpg, http://www.frontrowsociety.com/boutique/modules/contest/images/detail/1317314724Padr%C3%A3otoalhapiquenique75dpi.jpg
+    private static Bitmap antLifeDrawing; //Ant to use for lives in future http://www.moxiedot.com/wp-content/uploads/2013/07/ant.jpg
+    private static Bitmap beetleDrawing; //Beetle drawing created by Michael Madden
     //source: http://www.fotosearch.com/clip-art/picnic-basket.html
-    private static Bitmap butterflyDrawing;
-    //SOURCE FOR BUTTERFLY?
+    private static Bitmap butterflyDrawing; //Butterfly drawing created by Michael Madden
     private static Bitmap earthquakeDrawing;
     //source: http://www.beready.iowa.gov/Images/icons/earthquake_100px.png
 
@@ -126,8 +129,8 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
     private SharedPreferences highScoreThree; // To access the high scores
     private SharedPreferences highScoreFour; // To access the high scores
     private SharedPreferences highScoreFive; // To access the high scores
-    private String userName = "Null";
-    boolean saveHighScore = false;
+    private String userName = "Null"; //String from user input if they get a high score
+    boolean saveHighScore = false; //Boolean to determine whether a high score has been scored or not.
 
 
 
@@ -136,6 +139,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         super(context, atts);
         mainActivity = (Activity) context;
 
+        //Get various shared preferences that determine the game mode, the difficulty, and the high scores.
         difficulty = getContext().getSharedPreferences("difficulty",Context.MODE_PRIVATE);
         gameMode = getContext().getSharedPreferences("mode", Context.MODE_PRIVATE);
         highScoreOne = getContext().getSharedPreferences("highScoreOne", Context.MODE_PRIVATE);
@@ -147,6 +151,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         // only load the images the first time, if they haven't been loaded already
 
+        //Set the Bitmaps to the sources
             drawing = BitmapFactory.decodeResource(getResources(), R.drawable.picnicgrass);
             antLifeDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.ant_live);
             beetleDrawing = BitmapFactory.decodeResource(getResources(), R.mipmap.beetle);
@@ -162,30 +167,35 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
 
+        //Set ant characteristics
         blackAntPaint = new Paint();
         blackAntPaint.setColor(Color.BLACK);
         blackAntPaint.setStrokeWidth(4);
 
+        //Set fire ant characteristics
         fireAntPaint = new Paint();
         fireAntPaint.setColor(Color.RED);
         fireAntPaint.setStrokeWidth(4);
 
+        //ArrayList used to store bugs in Classic and Survival Mode
         allBugs = new ArrayList<Bug>();
 
+        //Instantiate the Timer Task
         timer = new Timer();
         myTimerTask = new MyTimerTask();
         timer.scheduleAtFixedRate(myTimerTask, 0, 1000);
     }
 
-    //populate the ants with random y position and random start times.
+    //populate the ants with random y position and random start times. For classic mode, the number is determined by the game mode. For Survival,
+    //it is set to ten. That way there are ten ants set to appear at the beginning of the game. All ants are added to
     public void populateAnts() {
         int randomFireAnt;
         double timer;
+        //if statement is used to determine which game mode is being used.
         if(!mode){
             for(int i = 0; i < num_ants; i++)
             {
                 randomFireAnt = randInt(0,100);
-                //  int timer = (randInt(3, (int) (time_ants  - 10));
                 timer = randDouble(3,(int) (time_ants - 5));
 
                 if(i == 0){
@@ -227,10 +237,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                     allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,1, x_speed * 1.4)); //add red ant to List of bugs
                 }
                 else if(randomFireAnt >= 90){
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,2, X_BUTTERFLY_SPEED_EASY)); //add butterfly to List of bugs
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 3, timer,2, X_BEETLE_SPEED_EASY)); //add beetle to List of bugs
                 }
                 else if(randomFireAnt >= 85){
-                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 3, timer,3, X_BEETLE_SPEED_EASY)); //add beetle to List of bugs
+                    allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 1, 1, timer,3, X_BUTTERFLY_SPEED_EASY)); //add butterfly to List of bugs
                 }
                 else{
                     allBugs.add(new Bug(randInt(-1000, (int) (screenWidth * .01)), randInt((int) (screenHeight * .3), (int) (screenHeight * .7)), 0, 1, timer,1, x_speed));//add black ant (most common)
@@ -238,7 +248,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                 addMoreBugs = false;
             }
         }
-
+        Collections.sort(allBugs, new CustomComparator());
         for(Bug bug: allBugs)
         {
             if((bug.health > 0 && mode) || (!mode && bug.health > 0 && (bug.time <= time_ants - timeLeft)))
@@ -265,7 +275,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         }
 
     }
-
+    //Method to 'kill' all the ants. Removes them from the screen.
     private void earthQuake(){
 
         for(Bug bug:allBugs){
@@ -274,10 +284,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         seconds = 0;
         level = 0;
     }
-    //check to see if the touch was near an ant.  If it was, change the ants status to 1 (dead)
+    //check to see if the touch was near a bug.  If it was, change the bugs status to dead
     private void checkTouch(int x, int y){
-        //for each ant in the list of ants, check to see if an ant is touched. If an ant is touched, it's health is reset.
-       // List<Bug> antsToRemove = new ArrayList<Bug>();
+        //for each bug in the list of bugs, check to see if a bug is touched. If a bug is touched, its health is set to 0.
         if(mode && earthquakePowerUp && (x >= 25 && x <= 75) && (y >= screenHeight-75 && y <= screenHeight - 25)){
             earthQuake();
             earthquakePowerUp = false;
@@ -285,9 +294,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         for(Bug bug: allBugs)
         {
+            //Different checks for the different types of bugs. They are different sizes so they need to be checked at different sizes.
             if(bug.bugType == 1){
                 if((Math.abs(bug.xCoordinate - x) < 30) && (Math.abs(bug.yCoordinate - y) < 30)){
-                    bug.health -=1;//ant killed, assigned -2
+                    bug.health -=1;//ant killed, assigned 0
                     bug.time = Integer.MAX_VALUE;//set Bug time to 'respawn' to after game so they never appear again
                     bug.xCoordinate = Integer.MIN_VALUE;//sets ants xCoordinate to be off the screen so you don't get points when clicking where they died.
                     if(bug.antColor == 0){
@@ -299,9 +309,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                     //antsToRemove.add(ant);
                 }
             }
-            else if(bug.bugType == 2){
+            else if(bug.bugType == 3){
                 if((x > bug.xCoordinate + 25 && x < bug.xCoordinate + 115) && (y > bug.yCoordinate + 30 && y < bug.yCoordinate + 120)){
-                    bug.health -=1;//ant killed, assigned -2
+                    bug.health -=1;//bug killed, assigned 0
                     bug.time = Integer.MAX_VALUE;//set Bug time to 'respawn' to after game so they never appear again
                     bug.xCoordinate = Integer.MIN_VALUE;//sets ants xCoordinate to be off the screen so you don't get points when clicking where they died.
                     lives-=1;
@@ -309,7 +319,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
             else{
                 if((x > bug.xCoordinate + 20 && x < bug.xCoordinate + 130) && (y > bug.yCoordinate + 40 && y < bug.yCoordinate + 100)){
-                    bug.health -=1;//ant killed, assigned -2
+                    bug.health -=1;//bug killed, assigned 0
                     if(bug.health <=0){
                         bug.time = Integer.MAX_VALUE;//set Bug time to 'respawn' to after game so they never appear again
                         bug.xCoordinate = Integer.MIN_VALUE;//sets ants xCoordinate to be off the screen so you don't get points when clicking where they died.
@@ -319,14 +329,14 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
 
         }
-
+        //Simpler way to remove bugs from the list, unfortunately this caused the Application to crash, so we had to improvise.
        // for(Bug ant: antsToRemove) {
             //allBugs.remove(ant);
         //}
 
     }
 
-    //draw the ants
+    //draw the ants or place bitmaps of the other bug types
     private void drawBug(float x, float y, Canvas canvas, Paint antColor, int bugType) {
         if(bugType == 1){
             float radiusMiddle = 4;
@@ -354,7 +364,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             canvas.drawLine(x,y,x + 30,y - 5,antColor);
             canvas.drawLine(x,y,x+ 30,y + 5,antColor);
         }
-       else if(bugType == 2){
+       else if(bugType == 3){
             canvas.drawBitmap(butterflyDrawing,x,y,null);
             //canvas.drawCircle(x+70,y+75,45,antColor);
         }
@@ -376,7 +386,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         return successfulAnts;
     }
 
-    //check to see if all ants are dead. Return true if all ants are dead.
+    //check to see if all ants are dead/off the screen. Return true if so.
     private boolean checkAntStatusClassic() {
         int countDoneAnts = 0;
         for(Bug ant: allBugs)
@@ -392,12 +402,12 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         if ((countDoneAnts == allBugs.size())) return true;
         else return false;
     }
-
+    //check to see if you are out of lives
     private boolean checkAntStatusSurvival() {
         for(Bug bug: allBugs)
         {
             if((bug.xCoordinate > (screenWidth)) && (bug.health >= 1)){//ant made it to the picnic basket
-                if(bug.bugType != 2){
+                if(bug.bugType != 3){
                     lives-=1;
                 }
                 bug.health = -1;//ant returned to pre game status
@@ -426,7 +436,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
-    //start a new game, check to see what the difficulty constants should be set to, reset timer
+    //start a new game, check to see what the difficulty constants should be set to, reset timer and reset Survival fields
     public void startNewGame() {
         String difString = difficulty.getString("difficulty","");
         String modeString = gameMode.getString("mode","");
@@ -437,17 +447,11 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
         highScore4 = highScoreFour.getString("highScoreFour", "0 Null");
         highScore5 = highScoreFive.getString("highScoreFive", "0 Null");
 
-        String highScore1Substring = highScore1.substring(0, highScore1.indexOf(" "));
-        String highScore2Substring = highScore2.substring(0, highScore2.indexOf(" "));
-        String highScore3Substring = highScore3.substring(0, highScore3.indexOf(" "));
-        String highScore4Substring = highScore4.substring(0, highScore4.indexOf(" "));
-        String highScore5Substring = highScore5.substring(0, highScore5.indexOf(" "));
-
-        highScore1Number = Integer.parseInt(highScore1Substring);
-        highScore2Number = Integer.parseInt(highScore2Substring);
-        highScore3Number = Integer.parseInt(highScore3Substring);
-        highScore4Number = Integer.parseInt(highScore4Substring);
-        highScore5Number = Integer.parseInt(highScore5Substring);
+        highScore1Number = Integer.parseInt(highScore1.substring(0, highScore1.indexOf(" ")));
+        highScore2Number = Integer.parseInt(highScore2.substring(0, highScore2.indexOf(" ")));
+        highScore3Number = Integer.parseInt(highScore3.substring(0, highScore3.indexOf(" ")));
+        highScore4Number = Integer.parseInt(highScore4.substring(0, highScore4.indexOf(" ")));
+        highScore5Number = Integer.parseInt(highScore5.substring(0, highScore5.indexOf(" ")));
 
 
 
@@ -509,6 +513,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
         timeLeft-=interval;
 
+        //if statement used to determine game mode. If mode is false, it's classic, else, it's survival.
         if(!mode){
             if (timeLeft <= 0.0)
             {
@@ -555,9 +560,9 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                         builder.setTitle(getResources().getString(messageId));
                         final EditText input = new EditText(getContext());
                         if(messageId == R.string.highScoreTitle){
+                            saveHighScore = true;
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
                             builder.setView(input);
-                            saveHighScore = true;
                         }
 
                         if(!mode){
@@ -574,6 +579,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                         if(saveHighScore){
                                             userName = input.getText().toString();
                                             saveHighScore(userName);
+                                            saveHighScore = false;
                                         }
                                         dialogIsDisplayed = false;
                                         startNewGame(); // set up and start a new game
@@ -588,6 +594,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
                                         if(saveHighScore){
                                             userName = input.getText().toString();
                                             saveHighScore(userName);
+                                            saveHighScore = false;
                                         }
                                         dialogIsDisplayed = false;
                                         stopGame();
@@ -656,7 +663,6 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             highScoreEditor = highScoreFive.edit();
             highScoreEditor.putString("highScoreFive", highScore4);
             highScoreEditor.apply();
-            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
         }
         else if(score > highScore4Number){
             highScoreEditor = highScoreFour.edit();
@@ -665,25 +671,23 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             highScoreEditor = highScoreFive.edit();
             highScoreEditor.putString("highScoreFive", highScore4);
             highScoreEditor.apply();
-            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
         }
         else if(score > highScore5Number){
             highScoreEditor = highScoreFive.edit();
             highScoreEditor.putString("highScoreFive", score + " " + name);
             highScoreEditor.apply();
-            showGameOverDialog(R.string.highScoreTitle, R.string.closeHighScore); // show the losing dialog
         }
     }
 
 
-    //add the time remaining and number of ants in basket to screen
+    //add the time remaining and number of ants in basket to screen OR add the lives and score to the screen.
     public void insertTime(Canvas canvas) {
         Paint topBar = new Paint();
         topBar.setColor(Color.rgb(64,64,64));
 
         canvas.drawRect(0,0,screenWidth, 55, topBar);
 
-        if(mode){
+        if(mode) {
            /* antLifeDring = antLifeDrawing.createScaledBitmap(antLifeDrawing,50,50,true);
             for(int i = 1; i <= lives; i++){
 
@@ -691,6 +695,10 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
 
             }*/ //Code for drawing ants instead of using numbers to represent lives
             canvas.drawText("Score: " + score, 25, 45, textPaint);
+            //ensure that lives display is never under 0
+            if (lives < 0){
+                lives = 0;
+            }
             canvas.drawText("Lives: " + lives, screenWidth - 200, 45, textPaint);
             if(earthquakePowerUp){
                 earthquakeDrawing = earthquakeDrawing.createScaledBitmap(earthquakeDrawing,50,50,true);
@@ -844,6 +852,7 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
     }
+    //Timer Task to increment the level
     class MyTimerTask extends TimerTask {
 
         @Override
@@ -856,5 +865,13 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
+    }
+    //Class to sort bugs so Butterflies are always on top
+    // Code help from http://stackoverflow.com/questions/2784514/sort-arraylist-of-custom-objects-by-property
+    public class CustomComparator implements Comparator<Bug> {
+        @Override
+        public int compare(Bug o1, Bug o2) {
+            return Integer.compare(o1.bugType,o2.bugType);
+        }
     }
 }

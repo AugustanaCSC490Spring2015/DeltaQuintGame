@@ -98,6 +98,7 @@ public class SplashActivity extends Activity {
             }
             prefEditor.apply();
     }
+    //toggles the current game mode
        private void toggleMode(Switch survivalMode) {
            gameMode = getSharedPreferences("mode", MODE_PRIVATE);
            SharedPreferences.Editor modeEditor = gameMode.edit();

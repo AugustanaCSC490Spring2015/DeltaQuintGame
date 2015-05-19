@@ -36,6 +36,7 @@ public class HighScores extends Activity {
             setHighScores();
         }
 
+        //Sets the five text views on the High Score screen to the current high scores.
         public void setHighScores(){
             textHighScore1 = (TextView) findViewById(R.id.uiHighOne);
             textHighScore2 = (TextView) findViewById(R.id.uiHighTwo);
